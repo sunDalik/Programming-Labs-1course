@@ -38,19 +38,10 @@ public class Sea implements Comparable<Sea>, Serializable {
 
 
     public String toCsv() {
-        return name + "," + size + "," + powerLimit + "," + x + "," + y + "," + creationDate;
+        return name + "," + size + "," + powerLimit + "," + x + "," + y + "," + color + "," + creationDate;
     }
 
-    public String toJson() {
-        return "{\n" +
-                "\"name\": " + name + ",\n" +
-                "\"size\": " + size + ",\n" +
-                "\"powerLimit\": " + powerLimit + ",\n" +
-                "\"x\": " + x + ",\n" +
-                "\"y\": " + y + ",\n" +
-                "\"creationDate\": " + creationDate + ",\n" +
-                "}";
-    }
+    public Object[] toArray() { return new Object[]{name, size, powerLimit, x, y, color, creationDate}; }
 
     @Override
     public int compareTo(Sea o) {

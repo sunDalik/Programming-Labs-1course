@@ -1,5 +1,7 @@
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Supplier;
@@ -9,12 +11,12 @@ import java.util.stream.Stream;
 
 public class SeaManager {
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<Sea>());
-    private Date initDate;
     private String file;
+    private GUI gui;
 
-    public SeaManager(String file) {
-        initDate = new Date();
+    public SeaManager(String file, GUI gui) {
         this.file = file;
+        this.gui = gui;
     }
 
     /**
@@ -30,9 +32,14 @@ public class SeaManager {
             }
             FileLoader.close();
         } catch (FileNotFoundException e) {
-            System.out.println("В качестве аргумента передан некорректный путь к файлу либо доступ к его чтению закрыт.");
-            System.exit(1);
+            try {
+                new File(file).createNewFile();
+            } catch (IOException ee) {
+                System.out.println(ee.getMessage());
+                System.exit(1);
+            }
         }
+        gui.refreshTable(seaList);
     }
 
     /**
@@ -72,24 +79,29 @@ public class SeaManager {
     }
 
     /**
-     * Выводит информацию о коллекции
-     *
-     * @return info - Тип коллекции, кол-во элементов в ней и дата ее инициализации
-     */
-    public String info() {
-        Stream<Sea> SeaStream = seaList.stream();
-        String info = "";
-        info += "Тип: " + seaList.getClass() + "\n";
-        info += "Количество элементов: " + SeaStream.count() + "\n";
-        info += "Дата инициалазации: " + initDate + "\n";
-        return info;
-    }
-
-    /**
      * Добавляет в коллекцию все элементы другой коллекции
      */
-    public void importCollection(LinkedList<Sea> collectionToImport) {
-        seaList.addAll(collectionToImport);
+    public void importCollection() {
+        JFileChooser jfc = new JFileChooser();
+        jfc.setCurrentDirectory(new java.io.File("."));
+        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File collectionToImportFile = jfc.getSelectedFile();
+            LinkedList<Sea> collectionToImport = new LinkedList<Sea>();
+            try {
+                Scanner importLoader = new Scanner(collectionToImportFile);
+                importLoader.useDelimiter("[,\n]");
+                while (importLoader.hasNext()) {
+                    collectionToImport.add(new Sea(importLoader.next(), Double.parseDouble(importLoader.next()), importLoader.nextInt(), Double.parseDouble(importLoader.next()), Double.parseDouble(importLoader.next()), Colors.valueOf(importLoader.next()), importLoader.next()));
+                }
+                importLoader.close();
+            } catch (FileNotFoundException e) {
+                System.out.println("Файл был удален");
+            }
+            catch (IllegalArgumentException | InputMismatchException e){
+                System.out.println("Неправильный формат коллекции!");
+            }
+            seaList.addAll(collectionToImport);
+        }
     }
 
     /**
@@ -133,6 +145,7 @@ public class SeaManager {
      */
     public void add(Sea object) {
         seaList.add(object);
+        gui.addToTable(object);
     }
 
     /**
@@ -141,13 +154,6 @@ public class SeaManager {
     public String read() {
         Stream<Sea> SeaStream = seaList.stream();
         return SeaStream.map(s -> s.toCsv() + "\n").collect(Collectors.joining());
-    }
-
-    /**
-     * Выводит список всех доступных командыы
-     */
-    public String help() {
-        return "Список команд: load, exit, sort, remove_first, remove_last, info, import, download, save, remove_greater, add_if_min, add, read, help";
     }
 
     public void save() {
@@ -160,6 +166,8 @@ public class SeaManager {
         }
 
     }
+
+    public List<Sea> getSeaList(){ return seaList; }
 
 
     /*

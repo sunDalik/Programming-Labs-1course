@@ -4,18 +4,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Main {
+    static SeaManager sm = new SeaManager("collection.csv", new GUI());
 
     public static void main(String[] args) {
-        new GUI();
-
-        SeaManager sm = null;
-        try {
-            sm = new SeaManager(args[0]);
-        } catch (Exception e){
-            System.out.println("Введите правильное имя файла в качестве аргумента командной строки.");
-            System.exit(1);
-        }
-        //sm.load();
+        sm.load();
         try {
             try (ServerSocket server = new ServerSocket(11037)) {
                 while (true) {
