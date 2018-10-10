@@ -160,6 +160,11 @@ class GUI extends JFrame {
 
         //Листенеры
         add_button.addActionListener(args0 -> checkInput("add"));
+        add_if_min_button.addActionListener(args0 -> checkInput("add_if_min"));
+        remove_last_button.addActionListener(args0 -> Main.sm.remove_last());
+        remove_first_button.addActionListener(args0 -> Main.sm.remove_first());
+        remove_greater_button.addActionListener(args0 -> checkInput("remove_greater"));
+        sort_button.addActionListener(args0 -> Main.sm.sort());
 
         setTitle("Sea Collection Manager");
         setSize(1100, 620);
@@ -174,13 +179,31 @@ class GUI extends JFrame {
         }
         //check if isNumber other fields. Don't know how to do it yet.
         else {
-            Main.sm.add(new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), (double) xSlider.getValue(), (double) ySlider.getValue(), (Colors) colorsbox.getSelectedItem()));
+            Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), (double) xSlider.getValue(), (double) ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
+            switch (command) {
+                case "add":
+                    Main.sm.add(sea);
+                    break;
+                case "add_if_min":
+                    if (Main.sm.add_if_min(sea)){
+                        printToConsole("Good", false);
+                    }
+                    else {
+                        printToConsole("Not min", false);
+                    }
+                    break;
+                case "remove_greater":
+                    Main.sm.remove_greater(sea);
+                    break;
+            }
         }
     }
 
     void addToTable(Sea sea) {
         collectionModel.addRow(sea.toArray());
     }
+
+    void removeLastRow() { collectionModel.removeRow(collectionModel.getRowCount() - 1);}
 
     void refreshTable(java.util.List<Sea> seaList){
         collectionModel.setRowCount(0);

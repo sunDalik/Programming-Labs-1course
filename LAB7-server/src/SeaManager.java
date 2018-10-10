@@ -48,34 +48,23 @@ public class SeaManager {
     public void sort() {
         seaList = seaList.stream().sorted(Sea::compareTo).collect(Collectors.toList());
         //Collections.sort(seaList);
+        gui.refreshTable(seaList);
     }
 
     /**
      * Удаляет первый элемент коллекции
      */
-    public String remove_first() {
-        Stream<Sea> SeaStream = seaList.stream();
-        if (SeaStream.limit(1).count() > 0) {
-            Sea outputObj = seaList.get(0);
-            seaList.remove(0);
-            return outputObj.toCsv();
-        } else {
-            return "null";
-        }
+    public void remove_first() {
+        seaList.remove(0);
+        gui.refreshTable(seaList);
     }
 
     /**
      * Удаляет последний элемент коллекции
      */
-    public String remove_last() {
-        Supplier<Stream<Sea>> SeaStream = () -> seaList.stream();
-        if (SeaStream.get().limit(1).count() > 0) {
-            Sea outputObj = seaList.get((int) SeaStream.get().count() - 1);
-            seaList.remove((int) SeaStream.get().count() - 1);
-            return outputObj.toCsv();
-        } else {
-            return "null";
-        }
+    public void remove_last() {
+       seaList.remove(seaList.size()-1);
+       gui.removeLastRow();
     }
 
     /**
@@ -100,26 +89,24 @@ public class SeaManager {
             catch (IllegalArgumentException | InputMismatchException e){
                 System.out.println("Неправильный формат коллекции!");
             }
-            seaList.addAll(collectionToImport);
+            for (Sea sea : collectionToImport) {
+                seaList.add(sea);
+                gui.addToTable(sea);
+            }
         }
     }
 
     /**
      * Удаляет все элементы, превышающие по значению заданный
      *
-     * @return n - число удаленных элементов
      */
-    public int remove_greater(Sea object) {
-        Supplier<Stream<Sea>> SeaStream = () -> seaList.stream();
-        int n = 0;
-        if (SeaStream.get().limit(1).count() == 0) return 0;
-        for (int i = (int) SeaStream.get().count() - 1; i >= 0; i--) {
+    void remove_greater(Sea object) {
+        for (int i = seaList.size() - 1; i >= 0; i--) {
             if (seaList.get(i).compareTo(object) > 0) {
                 seaList.remove(i);
-                n++;
             }
         }
-        return n;
+        gui.refreshTable(seaList);
     }
 
     /**
@@ -129,13 +116,14 @@ public class SeaManager {
      */
     public boolean add_if_min(Sea object) {
         Supplier<Stream<Sea>> SeaStreamSupplier = () -> seaList.stream();
-
         if (SeaStreamSupplier.get().limit(1).count() == 0) {
             seaList.add(object);
+            gui.addToTable(object);
             return true;
         }
         if (object.compareTo(SeaStreamSupplier.get().min(Sea::compareTo).get()) < 0) {
             seaList.add(object);
+            gui.addToTable(object);
             return true;
         } else return false;
     }
@@ -143,7 +131,7 @@ public class SeaManager {
     /**
      * Добавляет новый объект в коллекцию
      */
-    public void add(Sea object) {
+    void add(Sea object) {
         seaList.add(object);
         gui.addToTable(object);
     }
@@ -151,12 +139,12 @@ public class SeaManager {
     /**
      * возвращает объекты коллекции в формате csv
      */
-    public String read() {
+    String read() {
         Stream<Sea> SeaStream = seaList.stream();
         return SeaStream.map(s -> s.toCsv() + "\n").collect(Collectors.joining());
     }
 
-    public void save() {
+    void save() {
         try {
             PrintWriter pw = new PrintWriter(file);
             pw.print(read());
