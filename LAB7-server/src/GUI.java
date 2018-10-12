@@ -161,10 +161,10 @@ class GUI extends JFrame {
         //Листенеры
         add_button.addActionListener(args0 -> checkInput("add"));
         add_if_min_button.addActionListener(args0 -> checkInput("add_if_min"));
-        remove_last_button.addActionListener(args0 -> Main.sm.remove_last());
-        remove_first_button.addActionListener(args0 -> Main.sm.remove_first());
+        remove_last_button.addActionListener(args0 -> dontCheckInput("remove_last"));
+        remove_first_button.addActionListener(args0 -> dontCheckInput("remove_first"));
         remove_greater_button.addActionListener(args0 -> checkInput("remove_greater"));
-        sort_button.addActionListener(args0 -> Main.sm.sort());
+        sort_button.addActionListener(args0 -> dontCheckInput("sort"));
 
         setTitle("Sea Collection Manager");
         setSize(1100, 620);
@@ -177,25 +177,128 @@ class GUI extends JFrame {
         if (nameField.getText().isEmpty()) {
             printToConsole("Name field is empty!",true);
         }
-        //check if isNumber other fields. Don't know how to do it yet.
+        else if (!isNumeric(sizeField.getText())){
+            printToConsole("Size value is not a number!", true);
+        }
+        else if (Double.parseDouble(sizeField.getText()) <= 0) {
+            printToConsole("Size can't be negative!", true);
+        }
+        else if (!isNumeric(powerField.getText())){
+            printToConsole("Power is not a number!", true);
+        }
+        else if ((int)Double.parseDouble(powerField.getText()) <= 0){
+            printToConsole("Power can't be negative", true);
+        }
         else {
             Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), (double) xSlider.getValue(), (double) ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
             switch (command) {
                 case "add":
                     Main.sm.add(sea);
+                    int r = new Random().nextInt(7);
+                    switch (r){
+                        case 0:
+                            printToConsole("Good job, Mr. God", false);
+                            break;
+                        case 1:
+                            printToConsole("Poseidon, grant us your blessing...", false);
+                            break;
+                        case 2:
+                            printToConsole("Wow that's a lot of water", false);
+                            break;
+                        case 3:
+                            printToConsole("Pwease hewp me I'm drowning OwO", false);
+                            break;
+                        case 4:
+                            printToConsole("You are the ocean's gray waves...", false);
+                            break;
+                        case 5:
+                            printToConsole("Woah this sea is pretty liquid", false);
+                            break;
+                        case 6:
+                            printToConsole("splash splash", false);
+                            break;
+                    };
                     break;
                 case "add_if_min":
                     if (Main.sm.add_if_min(sea)){
-                        printToConsole("Good", false);
+                        int r2 = new Random().nextInt(3);
+                        switch (r2) {
+                            case 0:
+                                printToConsole("Cute little sea", false);
+                                break;
+                            case 1:
+                                printToConsole("Such a tiny water", false);
+                                break;
+                            case 2:
+                                printToConsole("s m a l l", false);
+                                break;
+                        }
                     }
                     else {
-                        printToConsole("Not min", false);
+                        int r3 = new Random().nextInt(3);
+                        switch (r3) {
+                            case 0:
+                                printToConsole("Woah woah hold on that's too big", false);
+                                break;
+                            case 1:
+                                printToConsole("B I G", false);
+                                break;
+                            case 2:
+                                printToConsole("Sorry, big sea is not allowed", false);
+                                break;
+                        }
                     }
                     break;
                 case "remove_greater":
-                    Main.sm.remove_greater(sea);
+                    int n = Main.sm.remove_greater(sea);
+                    if (n == 0){
+                        printToConsole("No sea can outdo the one you've entered...", false);
+                    }
+                    else {
+                        printToConsole(n + " great seas were completely disintegrated", false);
+                    }
                     break;
             }
+        }
+    }
+
+    void dontCheckInput(String command){
+        switch (command){
+            case ("sort"):
+                if (Main.sm.sort()) {
+                    printToConsole("Chaos is defeated...", false);
+                }
+                else {
+                    printToConsole("The world is empty...", false);
+                }
+                break;
+            case ("remove_first"):
+                if (Main.sm.remove_first()) {
+                    printToConsole("The original sea... It dried out!", false);
+                }
+                else {
+                    printToConsole("No sea...", false);
+                }
+                break;
+            case ("remove_last"):
+                if (Main.sm.remove_last()) {
+                    int r = new Random().nextInt(3);
+                    switch (r) {
+                        case 0:
+                            printToConsole("Evaporate. Let's start E V A P O R A T I N G", false);
+                            break;
+                        case 1:
+                            printToConsole("Burn sea BURN!", false);
+                            break;
+                        case 2:
+                            printToConsole("Some huge man has just drunk all the water in the last sea!", false);
+                            break;
+                    }
+                }
+                else {
+                    printToConsole("I'm thirsty... God, bring us water!", false);
+                }
+                break;
         }
     }
 
@@ -218,4 +321,7 @@ class GUI extends JFrame {
         }
         operationResult.setText(" " + text);
     }
+
+    public boolean isNumeric(String str) { return str.matches("-?\\d+(\\.\\d+)?"); }
+
 }

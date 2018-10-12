@@ -45,26 +45,44 @@ public class SeaManager {
     /**
      * Сортировка коллекции по возрастанию size моря
      */
-    public void sort() {
-        seaList = seaList.stream().sorted(Sea::compareTo).collect(Collectors.toList());
-        //Collections.sort(seaList);
-        gui.refreshTable(seaList);
+    public boolean sort() {
+        if (seaList.size() > 0) {
+            seaList = seaList.stream().sorted(Sea::compareTo).collect(Collectors.toList());
+            //Collections.sort(seaList);
+            gui.refreshTable(seaList);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
      * Удаляет первый элемент коллекции
      */
-    public void remove_first() {
-        seaList.remove(0);
-        gui.refreshTable(seaList);
+    public boolean remove_first() {
+        if (seaList.size() > 0) {
+            seaList.remove(0);
+            gui.refreshTable(seaList);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
      * Удаляет последний элемент коллекции
      */
-    public void remove_last() {
-       seaList.remove(seaList.size()-1);
-       gui.removeLastRow();
+    public boolean remove_last() {
+        if (seaList.size() > 0) {
+            seaList.remove(seaList.size() - 1);
+            gui.removeLastRow();
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -100,13 +118,16 @@ public class SeaManager {
      * Удаляет все элементы, превышающие по значению заданный
      *
      */
-    void remove_greater(Sea object) {
+    int remove_greater(Sea object) {
+        int n = 0;
         for (int i = seaList.size() - 1; i >= 0; i--) {
             if (seaList.get(i).compareTo(object) > 0) {
                 seaList.remove(i);
+                n ++;
             }
         }
         gui.refreshTable(seaList);
+        return n;
     }
 
     /**
