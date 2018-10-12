@@ -6,7 +6,7 @@ import java.util.Locale;
 public class Sea implements Comparable<Sea>, Serializable {
     private String name;
     private double size;
-    private int powerLimit;
+    private int power;
     private double x;
     private double y;
     private Colors color;
@@ -16,20 +16,26 @@ public class Sea implements Comparable<Sea>, Serializable {
 
     Sea() { }
 
-    public Sea(String name, double size, int powerLimit, double x, double y, Colors color) {
+    /**
+     * Is used to add new element to collection
+     */
+    Sea(String name, double size, int power, double x, double y, Colors color) {
         this.name = name;
         this.size = size;
-        this.powerLimit = powerLimit;
+        this.power = power;
         this.x = x;
         this.y = y;
         this.color = color;
         creationDate = sdf.format(new Date());
     }
 
-    public Sea(String name, double size, int powerLimit, double x, double y, Colors color, String creationDate) {
+    /**
+     * Is used to load element from file to collection
+     */
+    Sea(String name, double size, int power, double x, double y, Colors color, String creationDate) {
         this.name = name;
         this.size = size;
-        this.powerLimit = powerLimit;
+        this.power = power;
         this.x = x;
         this.y = y;
         this.color = color;
@@ -37,11 +43,12 @@ public class Sea implements Comparable<Sea>, Serializable {
     }
 
 
-    public String toCsv() {
-        return name + "," + size + "," + powerLimit + "," + x + "," + y + "," + color + "," + creationDate;
-    }
+    String toCsv() {
+        return name + "," + size + "," + power + "," + x + "," + y + "," + color + "," + creationDate; }
 
-    public Object[] toArray() { return new Object[]{name, size, powerLimit, x, y, color, creationDate}; }
+
+    Object[] toArray() { return new Object[]{name, size, power, x, y, color, creationDate}; }
+
 
     @Override
     public int compareTo(Sea o) {

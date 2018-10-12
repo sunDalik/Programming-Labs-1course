@@ -1,4 +1,3 @@
-import javax.swing.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,7 +17,5 @@ public class Main {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
-
     }
 }

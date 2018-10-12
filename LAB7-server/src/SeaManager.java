@@ -14,15 +14,15 @@ public class SeaManager {
     private String file;
     private GUI gui;
 
-    public SeaManager(String file, GUI gui) {
+    SeaManager(String file, GUI gui) {
         this.file = file;
         this.gui = gui;
     }
 
     /**
-     * Загрузка коллекции из файла
+     * Loads all elements from file to collection
      */
-    public void load() {
+    void load() {
         try {
             Scanner FileLoader = new Scanner(new File(file));
             FileLoader.useDelimiter("[,\n]");
@@ -43,52 +43,55 @@ public class SeaManager {
     }
 
     /**
-     * Сортировка коллекции по возрастанию size моря
+     * Sorts elements by size value
+     *
+     * @return false if collection is empty
      */
-    public boolean sort() {
+    boolean sort() {
         if (seaList.size() > 0) {
             seaList = seaList.stream().sorted(Sea::compareTo).collect(Collectors.toList());
             //Collections.sort(seaList);
             gui.refreshTable(seaList);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
-     * Удаляет первый элемент коллекции
+     * Removes the first element of collection
+     *
+     * @return false if collection is empty
      */
-    public boolean remove_first() {
+    boolean remove_first() {
         if (seaList.size() > 0) {
             seaList.remove(0);
             gui.refreshTable(seaList);
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
-     * Удаляет последний элемент коллекции
+     * Removes the last element of collection
+     *
+     * @return false if collection is empty
      */
-    public boolean remove_last() {
+    boolean remove_last() {
         if (seaList.size() > 0) {
             seaList.remove(seaList.size() - 1);
             gui.removeLastRow();
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
     /**
-     * Добавляет в коллекцию все элементы другой коллекции
+     * Adds all elements from file you chose
      */
-    public void importCollection() {
+    void importCollection() {
         JFileChooser jfc = new JFileChooser();
         jfc.setCurrentDirectory(new java.io.File("."));
         if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
@@ -103,8 +106,7 @@ public class SeaManager {
                 importLoader.close();
             } catch (FileNotFoundException e) {
                 System.out.println("Файл был удален");
-            }
-            catch (IllegalArgumentException | InputMismatchException e){
+            } catch (IllegalArgumentException | InputMismatchException e) {
                 System.out.println("Неправильный формат коллекции!");
             }
             for (Sea sea : collectionToImport) {
@@ -115,15 +117,16 @@ public class SeaManager {
     }
 
     /**
-     * Удаляет все элементы, превышающие по значению заданный
+     * Deletes all elements greater than it
      *
+     * @return number of deleted elements
      */
     int remove_greater(Sea object) {
         int n = 0;
         for (int i = seaList.size() - 1; i >= 0; i--) {
             if (seaList.get(i).compareTo(object) > 0) {
                 seaList.remove(i);
-                n ++;
+                n++;
             }
         }
         gui.refreshTable(seaList);
@@ -131,11 +134,11 @@ public class SeaManager {
     }
 
     /**
-     * Добавляет новый элемент в коллекцию, если его значение меньше, чем у наименьшего элемента
+     * Adds new element to collection if there are no other elements smaller or equal to it
      *
-     * @return true - элемент добавлен, false - НЕ добавлен
+     * @return true - element added, false - not added
      */
-    public boolean add_if_min(Sea object) {
+    boolean add_if_min(Sea object) {
         Supplier<Stream<Sea>> SeaStreamSupplier = () -> seaList.stream();
         if (SeaStreamSupplier.get().limit(1).count() == 0) {
             seaList.add(object);
@@ -150,7 +153,7 @@ public class SeaManager {
     }
 
     /**
-     * Добавляет новый объект в коллекцию
+     * Adds new element to collection
      */
     void add(Sea object) {
         seaList.add(object);
@@ -158,13 +161,16 @@ public class SeaManager {
     }
 
     /**
-     * возвращает объекты коллекции в формате csv
+     * @return elements of collection in csv
      */
-    String read() {
+    private String read() {
         Stream<Sea> SeaStream = seaList.stream();
         return SeaStream.map(s -> s.toCsv() + "\n").collect(Collectors.joining());
     }
 
+    /**
+     * Saves collection to file
+     */
     void save() {
         try {
             PrintWriter pw = new PrintWriter(file);
@@ -175,22 +181,4 @@ public class SeaManager {
         }
 
     }
-
-    public List<Sea> getSeaList(){ return seaList; }
-
-
-    /*
-    {
-    "name": "someSea",
-    "size": 23,
-    "powerLimit": 2,
-    "latitude": 2.22,
-    "longitude": 1.22
-     }
-*/
-
-    //C:\Users\Далик\Desktop\aaa.csv
-    // C:\Users\Далик\Desktop\bbb.csv
-
-
 }

@@ -1,15 +1,7 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
-
 
 class GUI extends JFrame {
 
@@ -22,8 +14,11 @@ class GUI extends JFrame {
     private JSlider ySlider;
     private JLabel operationResult;
 
+    /**
+     * Creating the G U I
+     */
     GUI() {
-        //Кнопка File в верхней строке
+        //File menu bar
         JMenuBar menuBar = new JMenuBar();
         UIManager.put("Menu.font", new Font("Helvetica", Font.PLAIN, 16));
         UIManager.put("MenuItem.font", new Font("Helvetica", Font.PLAIN, 16));
@@ -44,7 +39,7 @@ class GUI extends JFrame {
         menuBar.add(file);
         setJMenuBar(menuBar);
 
-        // кнопки с командами
+        //Command Buttons
         JButton remove_greater_button = new JButton("Remove Greater");
         JButton remove_first_button = new JButton("Remove First");
         JButton remove_last_button = new JButton("Remove Last");
@@ -57,14 +52,8 @@ class GUI extends JFrame {
         sort_button.setBounds(165, 70, 130, 40);
         add_if_min_button.setBounds(20, 120, 130, 40);
         add_button.setBounds(165, 120, 130, 40);
-        add(remove_greater_button);
-        add(remove_first_button);
-        add(remove_last_button);
-        add(sort_button);
-        add(add_if_min_button);
-        add(add_button);
 
-        //Таблица
+        //Table
         String[] columns = {"Name", "Size", "Power", "X", "Y", "Color", "Creation Date"};
         collectionModel = new DefaultTableModel();
         collectionModel.setColumnIdentifiers(columns);
@@ -74,13 +63,12 @@ class GUI extends JFrame {
         table.getColumnModel().getColumn(2).setPreferredWidth(25);
         table.getColumnModel().getColumn(3).setPreferredWidth(25);
         table.getColumnModel().getColumn(4).setPreferredWidth(25);
-        table.getColumnModel().getColumn(5).setPreferredWidth(45);
+        table.getColumnModel().getColumn(5).setPreferredWidth(35);
         table.getColumnModel().getColumn(6).setPreferredWidth(70);
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBounds(320, 20, 750, 460);
-        add(scrollPane);
 
-        //Слайдеры
+        //Sliders
         xSlider = new JSlider();
         xSlider.setMinimum(-1000);
         xSlider.setMaximum(1000);
@@ -90,8 +78,6 @@ class GUI extends JFrame {
         xSlider.addChangeListener(e -> {
             xValue.setText(Integer.toString(xSlider.getValue()));
         });
-        add(xValue);
-        add(xSlider);
 
         ySlider = new JSlider();
         ySlider.setMinimum(-1000);
@@ -102,10 +88,8 @@ class GUI extends JFrame {
         ySlider.addChangeListener(e -> {
             yValue.setText(Integer.toString(ySlider.getValue()));
         });
-        add(yValue);
-        add(ySlider);
 
-        //Комбобокс для цвета
+        //Color ComboBox
         colorsbox = new JComboBox<Colors>();
         colorsbox.addItem(Colors.Blue);
         colorsbox.addItem(Colors.Sapphire);
@@ -114,20 +98,16 @@ class GUI extends JFrame {
         colorsbox.addItem(Colors.Mint);
         colorsbox.addItem(Colors.Emerald);
         colorsbox.setBounds(165, 175, 130, 25);
-        add(colorsbox);
 
-        // Текстовые поля
+        //Text Fields for name, size and power
         nameField = new JTextField();
         sizeField = new JTextField();
         powerField = new JTextField();
         nameField.setBounds(165, 220, 130, 25);
         sizeField.setBounds(165, 260, 130, 25);
         powerField.setBounds(165, 300, 130, 25);
-        add(nameField);
-        add(sizeField);
-        add(powerField);
 
-        // Окошко с результатами операций
+        //Operations result window
         operationResult = new JLabel();
         operationResult.setBounds(20, 500, 1050, 30);
         operationResult.setBackground(Color.BLACK);
@@ -135,10 +115,8 @@ class GUI extends JFrame {
         operationResult.setText(" Hello there");
         operationResult.setFont(new Font("Helvetica", Font.PLAIN, 18));
         operationResult.setForeground(Color.GREEN);
-        add(operationResult);
 
-
-        // Именна переменных
+        //Text labels
         JLabel colorText = new JLabel("Color:");
         JLabel nameText = new JLabel("Name:");
         JLabel sizeText = new JLabel("Size:");
@@ -151,20 +129,38 @@ class GUI extends JFrame {
         powerText.setBounds(65, 300, 100, 20);
         xText.setBounds(65, 350, 50, 20);
         yText.setBounds(65, 420, 50, 20);
-        add(colorText);
-        add(nameText);
-        add(sizeText);
-        add(powerText);
-        add(xText);
-        add(yText);
 
-        //Листенеры
+        //Listeners
         add_button.addActionListener(args0 -> checkInput("add"));
         add_if_min_button.addActionListener(args0 -> checkInput("add_if_min"));
         remove_last_button.addActionListener(args0 -> dontCheckInput("remove_last"));
         remove_first_button.addActionListener(args0 -> dontCheckInput("remove_first"));
         remove_greater_button.addActionListener(args0 -> checkInput("remove_greater"));
         sort_button.addActionListener(args0 -> dontCheckInput("sort"));
+
+        //AddEverything
+        add(remove_greater_button);
+        add(remove_first_button);
+        add(remove_last_button);
+        add(sort_button);
+        add(add_if_min_button);
+        add(add_button);
+        add(scrollPane);
+        add(xValue);
+        add(xSlider);
+        add(yValue);
+        add(ySlider);
+        add(colorsbox);
+        add(nameField);
+        add(sizeField);
+        add(powerField);
+        add(operationResult);
+        add(colorText);
+        add(nameText);
+        add(sizeText);
+        add(powerText);
+        add(xText);
+        add(yText);
 
         setTitle("Sea Collection Manager");
         setSize(1100, 620);
@@ -173,17 +169,21 @@ class GUI extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
+    /**
+     * Executes command that require checking input values
+     * @param command - add, add_if_min or remove_greater
+     */
     private void checkInput(String command) {
         if (nameField.getText().isEmpty()) {
             printToConsole("Name field is empty!",true);
         }
-        else if (!isNumeric(sizeField.getText())){
+        else if (notANumeric(sizeField.getText())){
             printToConsole("Size value is not a number!", true);
         }
         else if (Double.parseDouble(sizeField.getText()) <= 0) {
             printToConsole("Size can't be negative!", true);
         }
-        else if (!isNumeric(powerField.getText())){
+        else if (notANumeric(powerField.getText())){
             printToConsole("Power is not a number!", true);
         }
         else if ((int)Double.parseDouble(powerField.getText()) <= 0){
@@ -217,8 +217,9 @@ class GUI extends JFrame {
                         case 6:
                             printToConsole("splash splash", false);
                             break;
-                    };
+                    }
                     break;
+
                 case "add_if_min":
                     if (Main.sm.add_if_min(sea)){
                         int r2 = new Random().nextInt(3);
@@ -249,6 +250,7 @@ class GUI extends JFrame {
                         }
                     }
                     break;
+
                 case "remove_greater":
                     int n = Main.sm.remove_greater(sea);
                     if (n == 0){
@@ -262,7 +264,11 @@ class GUI extends JFrame {
         }
     }
 
-    void dontCheckInput(String command){
+    /**
+     * Executes command that don't require entering values
+     * @param command - sort, remove_first or remove_last
+     */
+    private void dontCheckInput(String command){
         switch (command){
             case ("sort"):
                 if (Main.sm.sort()) {
@@ -302,26 +308,33 @@ class GUI extends JFrame {
         }
     }
 
-    void addToTable(Sea sea) {
-        collectionModel.addRow(sea.toArray());
-    }
+    void addToTable(Sea sea) { collectionModel.addRow(sea.toArray()); }
 
     void removeLastRow() { collectionModel.removeRow(collectionModel.getRowCount() - 1);}
 
+    /**
+     * Deletes all rows from table and loads all elements from collection
+     * @param seaList - collection to load
+     */
     void refreshTable(java.util.List<Sea> seaList){
         collectionModel.setRowCount(0);
         for (Sea sea: seaList) addToTable(sea);
     }
 
-    void printToConsole(String text, Boolean isError) {
+    /**
+     * Prints message to the window with operations result
+     * @param message - literally message
+     * @param isError - true - red color, false - green color
+     */
+    private void printToConsole(String message, Boolean isError) {
         if (isError) {
             operationResult.setForeground(Color.RED);
         } else {
             operationResult.setForeground(Color.GREEN);
         }
-        operationResult.setText(" " + text);
+        operationResult.setText(" " + message);
     }
 
-    public boolean isNumeric(String str) { return str.matches("-?\\d+(\\.\\d+)?"); }
+    private boolean notANumeric(String str) { return !str.matches("-?\\d+(\\.\\d+)?"); }
 
 }
