@@ -12,7 +12,6 @@ public class Sea implements Comparable<Sea>, Serializable {
     private Colors color;
     private String creationDate;
     private static final long serialVersionUID = 78L;
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
 
     Sea() { }
 
@@ -26,6 +25,7 @@ public class Sea implements Comparable<Sea>, Serializable {
         this.x = x;
         this.y = y;
         this.color = color;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         creationDate = sdf.format(new Date());
     }
 

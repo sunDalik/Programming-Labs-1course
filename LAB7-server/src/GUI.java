@@ -46,12 +46,6 @@ class GUI extends JFrame {
         JButton sort_button = new JButton("Sort");
         JButton add_if_min_button = new JButton("Add if Min");
         JButton add_button = new JButton("Add");
-        remove_greater_button.setBounds(20, 20, 130, 40);
-        remove_first_button.setBounds(165, 20, 130, 40);
-        remove_last_button.setBounds(20, 70, 130, 40);
-        sort_button.setBounds(165, 70, 130, 40);
-        add_if_min_button.setBounds(20, 120, 130, 40);
-        add_button.setBounds(165, 120, 130, 40);
 
         //Table
         String[] columns = {"Name", "Size", "Power", "X", "Y", "Color", "Creation Date"};
@@ -66,50 +60,36 @@ class GUI extends JFrame {
         table.getColumnModel().getColumn(5).setPreferredWidth(35);
         table.getColumnModel().getColumn(6).setPreferredWidth(70);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(320, 20, 750, 460);
 
         //Sliders
         xSlider = new JSlider();
         xSlider.setMinimum(-1000);
         xSlider.setMaximum(1000);
-        xSlider.setBounds(35, 380, 250, 30);
         JLabel xValue = new JLabel("0.0");
-        xValue.setBounds(90, 350, 80, 20);
-        xSlider.addChangeListener(e -> {
-            xValue.setText(Integer.toString(xSlider.getValue()));
-        });
+        xSlider.addChangeListener(e -> xValue.setText(Integer.toString(xSlider.getValue())));
 
         ySlider = new JSlider();
         ySlider.setMinimum(-1000);
         ySlider.setMaximum(1000);
-        ySlider.setBounds(35, 450, 250, 30);
         JLabel yValue = new JLabel("0.0");
-        yValue.setBounds(90, 420, 80, 20);
-        ySlider.addChangeListener(e -> {
-            yValue.setText(Integer.toString(ySlider.getValue()));
-        });
+        ySlider.addChangeListener(e -> yValue.setText(Integer.toString(ySlider.getValue())));
 
         //Color ComboBox
-        colorsbox = new JComboBox<Colors>();
+        colorsbox = new JComboBox<>();
         colorsbox.addItem(Colors.Blue);
         colorsbox.addItem(Colors.Sapphire);
         colorsbox.addItem(Colors.Navy);
         colorsbox.addItem(Colors.Cyan);
         colorsbox.addItem(Colors.Mint);
         colorsbox.addItem(Colors.Emerald);
-        colorsbox.setBounds(165, 175, 130, 25);
 
         //Text Fields for name, size and power
         nameField = new JTextField();
         sizeField = new JTextField();
         powerField = new JTextField();
-        nameField.setBounds(165, 220, 130, 25);
-        sizeField.setBounds(165, 260, 130, 25);
-        powerField.setBounds(165, 300, 130, 25);
 
         //Operations result window
         operationResult = new JLabel();
-        operationResult.setBounds(20, 500, 1050, 30);
         operationResult.setBackground(Color.BLACK);
         operationResult.setOpaque(true);
         operationResult.setText(" Hello there");
@@ -123,12 +103,6 @@ class GUI extends JFrame {
         JLabel powerText = new JLabel("Power:");
         JLabel xText = new JLabel("X:");
         JLabel yText = new JLabel("Y:");
-        colorText.setBounds(65, 175, 100, 20);
-        nameText.setBounds(65, 220, 100, 20);
-        sizeText.setBounds(65, 260, 100, 20);
-        powerText.setBounds(65, 300, 100, 20);
-        xText.setBounds(65, 350, 50, 20);
-        yText.setBounds(65, 420, 50, 20);
 
         //Listeners
         add_button.addActionListener(args0 -> checkInput("add"));
@@ -138,33 +112,80 @@ class GUI extends JFrame {
         remove_greater_button.addActionListener(args0 -> checkInput("remove_greater"));
         sort_button.addActionListener(args0 -> dontCheckInput("sort"));
 
-        //AddEverything
-        add(remove_greater_button);
-        add(remove_first_button);
-        add(remove_last_button);
-        add(sort_button);
-        add(add_if_min_button);
-        add(add_button);
-        add(scrollPane);
-        add(xValue);
-        add(xSlider);
-        add(yValue);
-        add(ySlider);
-        add(colorsbox);
-        add(nameField);
-        add(sizeField);
-        add(powerField);
-        add(operationResult);
-        add(colorText);
-        add(nameText);
-        add(sizeText);
-        add(powerText);
-        add(xText);
-        add(yText);
+
+        //Layout
+        JPanel p6 = new JPanel();
+        p6.add(remove_greater_button);
+        p6.add(remove_first_button);
+        p6.add(remove_last_button);
+        p6.add(sort_button);
+        p6.add(add_if_min_button);
+        p6.add(add_button);
+        p6.setLayout(new GridLayout(3,2,15,15));
+
+        JPanel p7 = new JPanel();
+        p7.add(p6);
+        p7.add(colorText);
+        p7.add(colorsbox);
+        p7.add(nameText);
+        p7.add(nameField);
+        p7.add(sizeText);
+        p7.add(sizeField);
+        p7.add(powerText);
+        p7.add(powerField);
+        p7.setLayout(new GridLayout(4,2,10,10));
+
+        JPanel p8 = new JPanel();
+        p8.add(xText);
+        p8.add(xValue);
+        p8.setLayout(new FlowLayout());
+
+        JPanel p9 = new JPanel();
+        p9.add(xSlider);
+        p9.setLayout(new FlowLayout());
+
+        JPanel p10 = new JPanel();
+        p10.add(yText);
+        p10.add(yValue);
+        p10.setLayout(new FlowLayout());
+
+        JPanel p11 = new JPanel();
+        p11.add(ySlider);
+        p11.setLayout(new FlowLayout());
+
+        JPanel p5 = new JPanel();
+        p5.add(p6);
+        p5.add(Box.createRigidArea(new Dimension(0,20)));
+        p5.add(p7);
+        p5.add(Box.createRigidArea(new Dimension(0,15)));
+        p5.add(p8);
+        p5.add(p9);
+        p5.add(Box.createRigidArea(new Dimension(0,10)));
+        p5.add(p10);
+        p5.add(p11);
+        p5.setLayout(new BoxLayout(p5, BoxLayout.Y_AXIS));
+
+        JPanel p4 = new JPanel();
+        p4.add(scrollPane);
+        p4.setLayout(new FlowLayout());
+
+        JPanel p3 = new JPanel();
+        p3.add(p5);
+        p3.add(p4);
+        p3.setLayout(new FlowLayout());
+
+        JPanel p2 = new JPanel();
+        p2.add(operationResult);
+        p2.setLayout(new FlowLayout());
+
+        JPanel p1 = new JPanel();
+        p1.add(p3);
+        p1.add(p2);
+        p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+        add(p1);
 
         setTitle("Sea Collection Manager");
         setSize(1100, 620);
-        setLayout(null);
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
@@ -326,7 +347,7 @@ class GUI extends JFrame {
      * @param message - literally message
      * @param isError - true - red color, false - green color
      */
-    private void printToConsole(String message, Boolean isError) {
+    void printToConsole(String message, Boolean isError) {
         if (isError) {
             operationResult.setForeground(Color.RED);
         } else {

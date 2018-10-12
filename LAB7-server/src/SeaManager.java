@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class SeaManager {
-    private List<Sea> seaList = Collections.synchronizedList(new LinkedList<Sea>());
+class SeaManager {
+    private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
     private String file;
     private GUI gui;
 
@@ -44,7 +44,6 @@ public class SeaManager {
 
     /**
      * Sorts elements by size value
-     *
      * @return false if collection is empty
      */
     boolean sort() {
@@ -60,7 +59,6 @@ public class SeaManager {
 
     /**
      * Removes the first element of collection
-     *
      * @return false if collection is empty
      */
     boolean remove_first() {
@@ -75,7 +73,6 @@ public class SeaManager {
 
     /**
      * Removes the last element of collection
-     *
      * @return false if collection is empty
      */
     boolean remove_last() {
@@ -96,7 +93,7 @@ public class SeaManager {
         jfc.setCurrentDirectory(new java.io.File("."));
         if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
             File collectionToImportFile = jfc.getSelectedFile();
-            LinkedList<Sea> collectionToImport = new LinkedList<Sea>();
+            LinkedList<Sea> collectionToImport = new LinkedList<>();
             try {
                 Scanner importLoader = new Scanner(collectionToImportFile);
                 importLoader.useDelimiter("[,\n]");
@@ -105,9 +102,9 @@ public class SeaManager {
                 }
                 importLoader.close();
             } catch (FileNotFoundException e) {
-                System.out.println("Файл был удален");
+                gui.printToConsole("Файл был удален", true);
             } catch (IllegalArgumentException | InputMismatchException e) {
-                System.out.println("Неправильный формат коллекции!");
+                gui.printToConsole("Неправильный формат коллекции!", true);
             }
             for (Sea sea : collectionToImport) {
                 seaList.add(sea);
@@ -118,7 +115,6 @@ public class SeaManager {
 
     /**
      * Deletes all elements greater than it
-     *
      * @return number of deleted elements
      */
     int remove_greater(Sea object) {
@@ -135,7 +131,6 @@ public class SeaManager {
 
     /**
      * Adds new element to collection if there are no other elements smaller or equal to it
-     *
      * @return true - element added, false - not added
      */
     boolean add_if_min(Sea object) {
