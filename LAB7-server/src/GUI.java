@@ -166,23 +166,17 @@ class GUI extends JFrame {
         p5.setLayout(new BoxLayout(p5, BoxLayout.Y_AXIS));
 
         JPanel p4 = new JPanel();
-        p4.add(scrollPane);
-        p4.setLayout(new FlowLayout());
-
-        JPanel p3 = new JPanel();
-        p3.add(p5);
-        p3.add(p4);
-        p3.setLayout(new FlowLayout());
+        p4.setLayout(new BorderLayout());
+        p4.add(scrollPane, BorderLayout.CENTER);
 
         JPanel p2 = new JPanel();
-        p2.add(operationResult);
-        p2.setLayout(new FlowLayout());
+        p2.setLayout(new BorderLayout());
+        p2.add(operationResult, BorderLayout.SOUTH);
 
-        JPanel p1 = new JPanel();
-        p1.add(p3);
-        p1.add(p2);
-        p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
-        add(p1);
+        Container container = getContentPane();
+        container.add(p2, BorderLayout.SOUTH);
+        container.add(p5, BorderLayout.WEST);
+        container.add(p4, BorderLayout.CENTER);
 
         setTitle("Sea Collection Manager");
         setSize(1100, 620);
