@@ -65,13 +65,13 @@ class GUI extends JFrame {
         xSlider = new JSlider();
         xSlider.setMinimum(-1000);
         xSlider.setMaximum(1000);
-        JLabel xValue = new JLabel("0.0");
+        JLabel xValue = new JLabel("0");
         xSlider.addChangeListener(e -> xValue.setText(Integer.toString(xSlider.getValue())));
 
         ySlider = new JSlider();
         ySlider.setMinimum(-1000);
         ySlider.setMaximum(1000);
-        JLabel yValue = new JLabel("0.0");
+        JLabel yValue = new JLabel("0");
         ySlider.addChangeListener(e -> yValue.setText(Integer.toString(ySlider.getValue())));
 
         //Color ComboBox
@@ -121,15 +121,16 @@ class GUI extends JFrame {
 
         //Layout
         JPanel p6 = new JPanel();
+        p6.setLayout(new GridLayout(3,2,18,10));
         p6.add(remove_greater_button);
         p6.add(remove_first_button);
         p6.add(remove_last_button);
         p6.add(sort_button);
         p6.add(add_if_min_button);
         p6.add(add_button);
-        p6.setLayout(new GridLayout(3,2,18,10));
 
         JPanel p7 = new JPanel();
+        p7.setLayout(new GridLayout(4,2,10,8));
         p7.add(p6);
         p7.add(colorText);
         p7.add(colorsbox);
@@ -139,7 +140,6 @@ class GUI extends JFrame {
         p7.add(sizeField);
         p7.add(powerText);
         p7.add(powerField);
-        p7.setLayout(new GridLayout(4,2,10,8));
 
         JPanel p8 = new JPanel();
         p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
@@ -162,6 +162,7 @@ class GUI extends JFrame {
         p11.add(ySlider);
 
         JPanel p5 = new JPanel();
+        p5.setLayout(new BoxLayout(p5, BoxLayout.Y_AXIS));
         p5.add(Box.createRigidArea(new Dimension(0,10)));
         p5.add(p6);
         p5.add(Box.createRigidArea(new Dimension(0,15)));
@@ -173,13 +174,12 @@ class GUI extends JFrame {
         p5.add(p10);
         p5.add(p11);
         p5.add(Box.createRigidArea(new Dimension(0,20)));
-        p5.setLayout(new BoxLayout(p5, BoxLayout.Y_AXIS));
 
         JPanel p5extended = new JPanel();
+        p5extended.setLayout(new BoxLayout(p5extended, BoxLayout.X_AXIS));
         p5extended.add(Box.createRigidArea(new Dimension(10,0)));
         p5extended.add(p5);
         p5extended.add(Box.createRigidArea(new Dimension(10,0)));
-        p5extended.setLayout(new BoxLayout(p5extended, BoxLayout.X_AXIS));
 
         JPanel p4 = new JPanel();
         p4.setLayout(new BorderLayout());
@@ -191,11 +191,13 @@ class GUI extends JFrame {
         p2.setLayout(new BorderLayout());
         p2.add(operationResult, BorderLayout.SOUTH);
 
-        Container container = getContentPane();
-        container.add(p2, BorderLayout.SOUTH);
-        container.add(p5extended, BorderLayout.WEST);
-        container.add(p4, BorderLayout.CENTER);
-        container.add(Box.createRigidArea(new Dimension(10,0)), BorderLayout.EAST);
+        JPanel p1 = new JPanel();
+        p1.setLayout(new BorderLayout());
+        p1.add(p2, BorderLayout.SOUTH);
+        p1.add(p5extended, BorderLayout.WEST);
+        p1.add(p4, BorderLayout.CENTER);
+        p1.add(Box.createRigidArea(new Dimension(10,0)), BorderLayout.EAST);
+        add(p1);
 
         setTitle("Sea Collection Manager");
         setSize(900, 600);

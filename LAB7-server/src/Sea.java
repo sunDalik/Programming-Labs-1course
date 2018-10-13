@@ -13,8 +13,6 @@ public class Sea implements Comparable<Sea>, Serializable {
     private String creationDate;
     private static final long serialVersionUID = 78L;
 
-    Sea() { }
-
     /**
      * Is used to add new element to collection
      */
