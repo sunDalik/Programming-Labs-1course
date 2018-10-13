@@ -6,62 +6,50 @@ import java.util.Locale;
 public class Sea implements Comparable<Sea>, Serializable {
     private String name;
     private double size;
-    private int powerLimit;
-    private double latitude;
-    private double longitude;
-    private Date creationTimeDate;
-    private String creationTime;
+    private int power;
+    private double x;
+    private double y;
+    private Colors color;
+    private String creationDate;
     private static final long serialVersionUID = 78L;
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US);
 
-    {
-        creationTimeDate = new Date();
-        creationTime = sdf.format(creationTimeDate);
-    }
-
-    Sea() {
-    }
-
-    public Sea(String name, double size, int powerLimit, double latitude, double longitude) {
+    /**
+     * Is used to add new element to collection
+     */
+    Sea(String name, double size, int power, double x, double y, Colors color) {
         this.name = name;
         this.size = size;
-        this.powerLimit = powerLimit;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.power = power;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
+        creationDate = sdf.format(new Date());
     }
 
-    public Sea(String name, double size, int powerLimit, double latitude, double longitude, String creationTime) {
+    /**
+     * Is used to load element from file to collection
+     */
+    Sea(String name, double size, int power, double x, double y, Colors color, String creationDate) {
         this.name = name;
         this.size = size;
-        this.powerLimit = powerLimit;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.creationTime = creationTime;
-        try {
-            creationTimeDate = sdf.parse(creationTime);
-        } catch (java.text.ParseException e) {
-            System.out.println(e.getMessage());
-        }
+        this.power = power;
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.creationDate = creationDate;
     }
 
 
-    public String toCsv() {
-        return name + "," + size + "," + powerLimit + "," + latitude + "," + longitude + "," + creationTime;
-    }
+    String toCsv() {
+        return name + "," + size + "," + power + "," + x + "," + y + "," + color + "," + creationDate; }
 
-    public String toJson() {
-        return "{\n" +
-                "\"name\": " + name + ",\n" +
-                "\"size\": " + size + ",\n" +
-                "\"powerLimit\": " + powerLimit + ",\n" +
-                "\"latitude\": " + latitude + ",\n" +
-                "\"longitude\": " + longitude + ",\n" +
-                "\"creationTime\": " + creationTime + "\n" +
-                "}";
-    }
+
+    Object[] toArray() { return new Object[]{name, size, power, x, y, color, creationDate}; }
+
 
     @Override
     public int compareTo(Sea o) {
-        return (int) (size - o.size);
+        return Double.compare(size,o.size);
     }
 }
