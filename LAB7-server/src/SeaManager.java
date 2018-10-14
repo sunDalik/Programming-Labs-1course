@@ -44,6 +44,7 @@ class SeaManager {
 
     /**
      * Sorts elements by size value
+     *
      * @return false if collection is empty
      */
     boolean sort() {
@@ -59,6 +60,7 @@ class SeaManager {
 
     /**
      * Removes the first element of collection
+     *
      * @return false if collection is empty
      */
     boolean remove_first() {
@@ -73,6 +75,7 @@ class SeaManager {
 
     /**
      * Removes the last element of collection
+     *
      * @return false if collection is empty
      */
     boolean remove_last() {
@@ -115,6 +118,7 @@ class SeaManager {
 
     /**
      * Deletes all elements greater than it
+     *
      * @return number of deleted elements
      */
     int remove_greater(Sea object) {
@@ -131,6 +135,7 @@ class SeaManager {
 
     /**
      * Adds new element to collection if there are no other elements smaller or equal to it
+     *
      * @return true - element added, false - not added
      */
     boolean add_if_min(Sea object) {
@@ -174,6 +179,9 @@ class SeaManager {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
 
+    List<Sea> getCollection() {
+        return seaList;
     }
 }

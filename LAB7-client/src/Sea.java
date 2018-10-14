@@ -42,14 +42,17 @@ public class Sea implements Comparable<Sea>, Serializable {
 
 
     String toCsv() {
-        return name + "," + size + "," + power + "," + x + "," + y + "," + color + "," + creationDate; }
+        return name + "," + size + "," + power + "," + x + "," + y + "," + color + "," + creationDate;
+    }
 
 
-    Object[] toArray() { return new Object[]{name, size, power, x, y, color, creationDate}; }
+    Object[] toArray() {
+        return new Object[]{name, size, power, x, y, color, creationDate};
+    }
 
 
     @Override
     public int compareTo(Sea o) {
-        return Double.compare(size,o.size);
+        return Double.compare(size, o.size);
     }
 }
