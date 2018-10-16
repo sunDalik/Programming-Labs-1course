@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +12,7 @@ class GUI extends JFrame {
     static private JLabel connectionText;
     private JPanel p3;
     private Circle[] circleList;
-    private Circle[] filteredCircles;
+    private ArrayList<Circle> filteredCircles;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
     private Connector connector;
     private JLabel filtersText;
@@ -402,7 +403,7 @@ class GUI extends JFrame {
     }
 
     private void applyFilters() {
-        filteredCircles = new Circle[seaList.size()];
+        filteredCircles = new ArrayList<>();
         for (int i = 0; i < seaList.size(); i++) {
             Sea sea = seaList.get(i);
             if (sea.getY() >= yFromSlider.getValue())
@@ -411,26 +412,27 @@ class GUI extends JFrame {
                         if (sea.getX() <= xToSlider.getValue()) {
                             boolean dateCheck = false;
                             try {
-                                if (sea.getDate().after(sdf.parse(dateFrom.getText())))
-                                    if (sea.getDate().before(sdf.parse(dateTo.getText()))) {
+                                if (dateFrom.getText().isEmpty() || sea.getDate().after(sdf.parse(dateFrom.getText()))) {
+                                    if (dateTo.getText().isEmpty() || sea.getDate().before(sdf.parse(dateTo.getText()))) {
                                         dateCheck = true;
                                     }
+                                }
                             } catch (ParseException e) {
                                 setFiltersText("Date format is dd-MM-yyyy", true);
                             }
                             if (dateCheck)
-                                if (sea.getPower() >= Integer.parseInt(powerFrom.getText())) {
-                                    if (sea.getPower() <= Integer.parseInt(powerTo.getText())) {
-                                        if (sea.getSize() >= Double.parseDouble(sizeFrom.getText()))
-                                            if (sea.getSize() <= Double.parseDouble(sizeTo.getText())) {
+                                if (powerFrom.getText().isEmpty() || sea.getPower() >= Integer.parseInt(powerFrom.getText())) {
+                                    if (powerTo.getText().isEmpty() || sea.getPower() <= Integer.parseInt(powerTo.getText())) {
+                                        if (sizeFrom.getText().isEmpty() || sea.getSize() >= Double.parseDouble(sizeFrom.getText()))
+                                            if (sizeTo.getText().isEmpty() || sea.getSize() <= Double.parseDouble(sizeTo.getText())) {
                                                 if (sea.getName().startsWith(nameField.getText())) {
-                                                    if (sea.getColor().name().equals(blueCheckBox.getText()) ||
-                                                            sea.getColor().name().equals(sapphireCheckBox.getText()) ||
-                                                            sea.getColor().name().equals(navyCheckBox.getText()) ||
-                                                            sea.getColor().name().equals(cyanCheckBox.getText()) ||
-                                                            sea.getColor().name().equals(mintCheckBox.getText()) ||
-                                                            sea.getColor().name().equals(emeraldCheckBox.getText())) {
-                                                        filteredCircles[i] = circleList[i];
+                                                    if (sea.getColor().name().equals(blueCheckBox.getText()) && blueCheckBox.isSelected() ||
+                                                            sea.getColor().name().equals(sapphireCheckBox.getText()) && sapphireCheckBox.isSelected() ||
+                                                            sea.getColor().name().equals(navyCheckBox.getText()) && navyCheckBox.isSelected() ||
+                                                            sea.getColor().name().equals(cyanCheckBox.getText()) && cyanCheckBox.isSelected() ||
+                                                            sea.getColor().name().equals(mintCheckBox.getText()) && mintCheckBox.isSelected() ||
+                                                            sea.getColor().name().equals(emeraldCheckBox.getText()) && emeraldCheckBox.isSelected()) {
+                                                        filteredCircles.add(circleList[i]);
                                                     }
                                                 }
                                             }
@@ -439,14 +441,14 @@ class GUI extends JFrame {
                         }
                 }
         }
-        if (filteredCircles.length == 0){
+        if (filteredCircles.size() == 0){
             startButton.setEnabled(true);
             setFiltersText("No objects found", false);
         }
         else {
             stopButton.setEnabled(true);
-            setFiltersText(filteredCircles.length + " object" + (filteredCircles.length == 1? "":"s") + " found", false);
-            
+            setFiltersText(filteredCircles.size() + " object" + (filteredCircles.size() == 1? "":"s") + " found", false);
+
         }
     }
 
