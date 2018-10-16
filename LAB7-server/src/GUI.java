@@ -65,12 +65,14 @@ class GUI extends JFrame {
         xSlider = new JSlider();
         xSlider.setMinimum(-1000);
         xSlider.setMaximum(1000);
+        xSlider.setValue(0);
         JLabel xValue = new JLabel("0");
         xSlider.addChangeListener(e -> xValue.setText(Integer.toString(xSlider.getValue())));
 
         ySlider = new JSlider();
         ySlider.setMinimum(-1000);
         ySlider.setMaximum(1000);
+        ySlider.setValue(0);
         JLabel yValue = new JLabel("0");
         ySlider.addChangeListener(e -> yValue.setText(Integer.toString(ySlider.getValue())));
 
@@ -93,7 +95,7 @@ class GUI extends JFrame {
         operationResult.setBackground(Color.BLACK);
         operationResult.setOpaque(true);
         operationResult.setText(" Hello there");
-        operationResult.setFont(new Font("Helvetica", Font.PLAIN, 18));
+        operationResult.setFont(new Font("Sans-Serif", Font.PLAIN, 18));
         operationResult.setForeground(Color.GREEN);
 
         //Text labels
@@ -226,7 +228,7 @@ class GUI extends JFrame {
             printToConsole("Power can't be negative", true);
         }
         else {
-            Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), (double) xSlider.getValue(), (double) ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
+            Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), xSlider.getValue(), ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
             switch (command) {
                 case "add":
                     Main.sm.add(sea);

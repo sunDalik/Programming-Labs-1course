@@ -28,7 +28,7 @@ class SeaManager {
             FileLoader.useDelimiter("[,\n]");
             seaList.clear();
             while (FileLoader.hasNext()) {
-                seaList.add(new Sea(FileLoader.next(), Double.parseDouble(FileLoader.next()), FileLoader.nextInt(), Double.parseDouble(FileLoader.next()), Double.parseDouble(FileLoader.next()), Colors.valueOf(FileLoader.next()), FileLoader.next()));
+                seaList.add(new Sea(FileLoader.next(), Double.parseDouble(FileLoader.next()), FileLoader.nextInt(), FileLoader.nextInt(), FileLoader.nextInt(), Colors.valueOf(FileLoader.next()), FileLoader.next()));
             }
             FileLoader.close();
         } catch (FileNotFoundException e) {
@@ -101,7 +101,7 @@ class SeaManager {
                 Scanner importLoader = new Scanner(collectionToImportFile);
                 importLoader.useDelimiter("[,\n]");
                 while (importLoader.hasNext()) {
-                    collectionToImport.add(new Sea(importLoader.next(), Double.parseDouble(importLoader.next()), importLoader.nextInt(), Double.parseDouble(importLoader.next()), Double.parseDouble(importLoader.next()), Colors.valueOf(importLoader.next()), importLoader.next()));
+                    collectionToImport.add(new Sea(importLoader.next(), Double.parseDouble(importLoader.next()), importLoader.nextInt(), importLoader.nextInt(), importLoader.nextInt(), Colors.valueOf(importLoader.next()), importLoader.next()));
                 }
                 importLoader.close();
             } catch (FileNotFoundException e) {

@@ -10,8 +10,8 @@ class GUI extends JFrame {
 
     static private JLabel connectionText;
     private JPanel p3;
+    private JPanel p3null;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
-    private Circle[] circlesList;
     private Connector connector;
 
     GUI(Connector connector) {
@@ -46,12 +46,15 @@ class GUI extends JFrame {
         connectionText.setOpaque(true);
         connectionText.setText(" ");
         connectionText.setBackground(Color.BLACK);
+        connectionText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection));
         JLabel filtersText = new JLabel();
         filtersText.setBackground(Color.BLACK);
         filtersText.setOpaque(true);
-        filtersText.setText(" ");
+        filtersText.setText(" I wonder what will happen...");
+        filtersText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
+        filtersText.setForeground(Color.GREEN);
         JLabel colorText2 = new JLabel("Color:");
         JCheckBox blueCheckBox = new JCheckBox("Blue");
         JCheckBox sapphireCheckBox = new JCheckBox("Sapphire");
@@ -248,7 +251,11 @@ class GUI extends JFrame {
         p4extended.add(Box.createRigidArea(new Dimension(10, 0)));
 
         p3 = new JPanel();
-        p3.setLayout(null);
+        p3.setLayout(new BorderLayout());
+
+        p3null = new JPanel();
+        p3null.setLayout(null);
+        p3.add(p3null);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
@@ -332,10 +339,8 @@ class GUI extends JFrame {
         List<Sea> tempSeaList = connector.getCollection();
         if (tempSeaList != null) {
             seaList = tempSeaList;
-            circlesList = new Circle[seaList.size()];
             for (int i = 0; i < seaList.size(); i++) {
-                Object[] seaData = seaList.get(i).toArray();
-                circlesList[i] = (new Circle(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue(), ((Double)seaData[1]).intValue(),  ((Colors) seaData[5]).getRgbColor()));            }
+            }
         }
     }
 
@@ -344,20 +349,30 @@ class GUI extends JFrame {
             List<Sea> tempSeaList = connector.getCollection();
             if (tempSeaList != null) {
                 seaList = tempSeaList;
-                circlesList = new Circle[seaList.size()];
-                p3.repaint();
-
+                Circle[] circleList = new Circle[seaList.size()];
                 for (int i = 0; i < seaList.size(); i++) {
                     Object[] seaData = seaList.get(i).toArray();
-                    circlesList[i] = (new Circle(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue(), ((Double)seaData[1]).intValue(),  ((Colors) seaData[5]).getRgbColor()));
-                    circlesList[i].setLocation(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue());
-                    circlesList[i].setSize( ((Double)seaData[1]).intValue(), ((Double)seaData[1]).intValue());
+                    Color seaColor = ((Colors) seaData[5]).getRgbColor();
+                    String seaColorName = ((Colors) seaData[5]).name();
+                    int seaX = (int) seaData[3];
+                    int seaY = (int) seaData[4];
+                    String seaName = (String) seaData[0];
+                    double seaSize = (double) seaData[1];
+                    int seaPower = (int) seaData[2];
+                    String seaDate = (String) seaData[6];
 
-                    p3.add(circlesList[i]);
-                    this.repaint();
+                    circleList[i] = new Circle(seaX, seaY, ((Double) seaSize).intValue(), seaColor);
+                    //circleList[i].setBackground(((Colors) seaData[5]).getRgbColor());
+                    //circleList[i].setBounds(seaX, seaY, ((Double) seaSize).intValue(), ((Double) seaSize).intValue());
 
+                    add(circleList[i]);
+
+                    p3null.repaint();
+                    circleList[i].dood();
+                    p3null.repaint();
+                    p3.repaint();
+                    this.revalidate();
                 }
-                GUI.this.revalidate();
                 break;
             }
         }

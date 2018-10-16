@@ -7,8 +7,8 @@ public class Sea implements Comparable<Sea>, Serializable {
     private String name;
     private double size;
     private int power;
-    private double x;
-    private double y;
+    private int x;
+    private int y;
     private Colors color;
     private String creationDate;
     private static final long serialVersionUID = 78L;
@@ -16,7 +16,7 @@ public class Sea implements Comparable<Sea>, Serializable {
     /**
      * Is used to add new element to collection
      */
-    Sea(String name, double size, int power, double x, double y, Colors color) {
+    Sea(String name, double size, int power, int x, int y, Colors color) {
         this.name = name;
         this.size = size;
         this.power = power;
@@ -30,7 +30,7 @@ public class Sea implements Comparable<Sea>, Serializable {
     /**
      * Is used to load element from file to collection
      */
-    Sea(String name, double size, int power, double x, double y, Colors color, String creationDate) {
+    Sea(String name, double size, int power, int x, int y, Colors color, String creationDate) {
         this.name = name;
         this.size = size;
         this.power = power;

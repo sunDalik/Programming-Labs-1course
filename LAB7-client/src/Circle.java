@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class Circle extends JComponent {
+public class Circle extends JPanel {
     private int x;
     private int y;
     private int diameter;
@@ -13,13 +13,21 @@ public class Circle extends JComponent {
         this.y = y;
         this.diameter = diameter;
         this.color = color;
-        setVisible(true);
+        //this.setBackground(color);
+        //this.setBounds(x, y, diameter, diameter);
+        this.repaint();
+        //setVisible(true);
     }
 
-    public void paintComponent(Graphics gr) {
-        super.paintComponents(gr);
-        Graphics2D g2d = (Graphics2D) gr;
-        g2d.setPaint(this.color);
-        g2d.fillOval(this.x, this.y, this.diameter, this.diameter);
+    void dood(){
+        this.repaint();
+    }
+    @Override
+    public void paint(Graphics g) {
+        //super.paintComponent (g);
+        //Graphics2D g2 = (Graphics2D) g;
+        g.setColor(this.color);
+        System.out.println("dssd");
+        g.fillOval(this.x, this.y, this.diameter, this.diameter);
     }
 }
