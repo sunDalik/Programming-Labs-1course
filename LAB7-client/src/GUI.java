@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +8,6 @@ class GUI extends JFrame {
 
     static private JLabel connectionText;
     private JPanel p3;
-    private JPanel p3null;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
     private Connector connector;
 
@@ -48,7 +45,7 @@ class GUI extends JFrame {
         connectionText.setBackground(Color.BLACK);
         connectionText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         JButton refreshButton = new JButton("Refresh");
-        refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection));
+        refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection).start());
         JLabel filtersText = new JLabel();
         filtersText.setBackground(Color.BLACK);
         filtersText.setOpaque(true);
@@ -95,10 +92,10 @@ class GUI extends JFrame {
         yToSlider.setMaximum(1000);
         JLabel yTo = new JLabel("0");
         yToSlider.addChangeListener(e -> yTo.setText(Integer.toString(yToSlider.getValue())));
-        xFrom.setPreferredSize(new Dimension(30, 20));
-        xTo.setPreferredSize(new Dimension(30, 20));
-        yFrom.setPreferredSize(new Dimension(30, 20));
-        yTo.setPreferredSize(new Dimension(30, 20));
+        xFrom.setPreferredSize(new Dimension(35, 20));
+        xTo.setPreferredSize(new Dimension(35, 20));
+        yFrom.setPreferredSize(new Dimension(35, 20));
+        yTo.setPreferredSize(new Dimension(35, 20));
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
 
@@ -251,11 +248,7 @@ class GUI extends JFrame {
         p4extended.add(Box.createRigidArea(new Dimension(10, 0)));
 
         p3 = new JPanel();
-        p3.setLayout(new BorderLayout());
-
-        p3null = new JPanel();
-        p3null.setLayout(null);
-        p3.add(p3null);
+        p3.setLayout(null);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
@@ -336,8 +329,13 @@ class GUI extends JFrame {
         List<Sea> tempSeaList = connector.getCollection();
         if (tempSeaList != null) {
             seaList = tempSeaList;
-            for (int i = 0; i < seaList.size(); i++) {
+            Circle[] circleList = new Circle[seaList.size()];
+            p3.removeAll();
+            for (Sea sea : seaList) {
+                p3.add(new Circle(sea));
             }
+            p3.revalidate();
+            p3.repaint();
         }
     }
 
@@ -347,26 +345,11 @@ class GUI extends JFrame {
             if (tempSeaList != null) {
                 seaList = tempSeaList;
                 Circle[] circleList = new Circle[seaList.size()];
-                for (int i = 0; i < seaList.size(); i++) {
-                    Object[] seaData = seaList.get(i).toArray();
-                    Color seaColor = ((Colors) seaData[5]).getRgbColor();
-                    String seaColorName = ((Colors) seaData[5]).name();
-                    int seaX = (int) seaData[3];
-                    int seaY = (int) seaData[4];
-                    String seaName = (String) seaData[0];
-                    double seaSize = (double) seaData[1];
-                    int seaPower = (int) seaData[2];
-                    String seaDate = (String) seaData[6];
-
-                    circleList[i] = new Circle(seaX, seaY, ((Double) seaSize).intValue(), seaColor);
-                    //circleList[i].setBackground(((Colors) seaData[5]).getRgbColor());
-                    //circleList[i].setBounds(seaX, seaY, ((Double) seaSize).intValue(), ((Double) seaSize).intValue());
-
-                    p3.add(circleList[i]);
-
-                    this.revalidate();
+                for (Sea sea : seaList) {
+                    p3.add(new Circle(sea));
                 }
-
+                p3.revalidate();
+                p3.repaint();
                 break;
             }
         }

@@ -18,9 +18,9 @@ public class Connector extends Thread {
 
     @Override
     public void run() {
-        SocketChannel sc = connect();
+        connect();
         while (true) {
-            sc = connect();
+            connect();
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {

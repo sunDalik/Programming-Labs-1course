@@ -1,30 +1,35 @@
 import javax.swing.*;
 import java.awt.*;
 
+public class Circle extends JButton {
+    private int opacity=255; //Непрозрачность
+    private Sea sea; //Каждому кружочку соответствует элемент коллекции
 
-public class Circle extends JPanel {
-    private int x;
-    private int y;
-    private int diameter;
-    private Color color;
-
-    Circle(int x, int y, int diameter, Color color) {
-        this.x = x;
-        this.y = y;
-        this.diameter = diameter;
-        this.color = color;
-        //this.setBackground(color);
-        //this.setBounds(x, y, diameter, diameter); //удаление этой строчки привело к появлению кругов
-        //this.repaint();
-        //setVisible(true);
+    Circle(Sea sea) {
+        this.sea = sea;
+        setBorder(null);
+        setEnabled(false);
+        setVisible(true);
+        setBounds(sea.getX(), sea.getY(), ((Double)sea.getSize()).intValue(), ((Double)sea.getSize()).intValue());
+        this.setToolTipText(sea.getName());
     }
 
+    //Делаем форму круга
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent (g);
-        Graphics2D g2 = (Graphics2D) g;
-        g2.setColor(this.color);
-        System.out.println("dssd");
-        g2.fillOval(this.x, this.y, this.diameter, this.diameter);
+        g.setColor(sea.getColor().getRgbColor());
+        g.fillOval(0, 0, ((Double)sea.getSize()).intValue(), ((Double)sea.getSize()).intValue());
+
     }
+
+    public void rebounds() {
+        setBounds(sea.getX(), sea.getY(), ((Double)sea.getSize()).intValue(), ((Double)sea.getSize()).intValue());
+    }
+    public int getOpacity() {return opacity;}
+
+    public void decrementOpacity(){opacity--;}
+
+    public void incrementOpacity() {opacity++;}
+
+    public void setOpacity(int opacity) {this.opacity=opacity;}
 }

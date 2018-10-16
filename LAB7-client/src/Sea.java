@@ -55,4 +55,32 @@ public class Sea implements Comparable<Sea>, Serializable {
     public int compareTo(Sea o) {
         return Double.compare(size, o.size);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public Colors getColor() {
+        return color;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
 }
