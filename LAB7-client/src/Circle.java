@@ -14,20 +14,17 @@ public class Circle extends JPanel {
         this.diameter = diameter;
         this.color = color;
         //this.setBackground(color);
-        //this.setBounds(x, y, diameter, diameter);
-        this.repaint();
+        //this.setBounds(x, y, diameter, diameter); //удаление этой строчки привело к появлению кругов
+        //this.repaint();
         //setVisible(true);
     }
 
-    void dood(){
-        this.repaint();
-    }
     @Override
-    public void paint(Graphics g) {
-        //super.paintComponent (g);
-        //Graphics2D g2 = (Graphics2D) g;
-        g.setColor(this.color);
+    public void paintComponent(Graphics g) {
+        super.paintComponent (g);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setColor(this.color);
         System.out.println("dssd");
-        g.fillOval(this.x, this.y, this.diameter, this.diameter);
+        g2.fillOval(this.x, this.y, this.diameter, this.diameter);
     }
 }

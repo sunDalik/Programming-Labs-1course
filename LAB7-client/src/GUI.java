@@ -310,13 +310,10 @@ class GUI extends JFrame {
         p2extended.add(botSpace);
         botSpace.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.BLACK));
 
-        JPanel p1 = new JPanel();
-        p1.setLayout(new BorderLayout());
-        p1.add(p2extended, BorderLayout.NORTH);
-        p1.add(p3, BorderLayout.CENTER);
-        p1.add(p4extended, BorderLayout.EAST);
-        add(p1);
-
+        setLayout(new BorderLayout());
+        add(p2extended, BorderLayout.NORTH);
+        add(p3, BorderLayout.CENTER);
+        add(p4extended, BorderLayout.EAST);
 
         setTitle("Sea Collection Viewer");
         setSize(1000, 700);
@@ -365,14 +362,11 @@ class GUI extends JFrame {
                     //circleList[i].setBackground(((Colors) seaData[5]).getRgbColor());
                     //circleList[i].setBounds(seaX, seaY, ((Double) seaSize).intValue(), ((Double) seaSize).intValue());
 
-                    add(circleList[i]);
+                    p3.add(circleList[i]);
 
-                    p3null.repaint();
-                    circleList[i].dood();
-                    p3null.repaint();
-                    p3.repaint();
                     this.revalidate();
                 }
+
                 break;
             }
         }
