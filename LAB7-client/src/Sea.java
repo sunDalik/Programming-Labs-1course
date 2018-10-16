@@ -1,7 +1,7 @@
 import java.io.Serializable;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Sea implements Comparable<Sea>, Serializable {
     private String name;
@@ -11,6 +11,7 @@ public class Sea implements Comparable<Sea>, Serializable {
     private int y;
     private Colors color;
     private String creationDate;
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     private static final long serialVersionUID = 78L;
 
     /**
@@ -23,7 +24,6 @@ public class Sea implements Comparable<Sea>, Serializable {
         this.x = x;
         this.y = y;
         this.color = color;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.US);
         creationDate = sdf.format(new Date());
     }
 
@@ -80,7 +80,15 @@ public class Sea implements Comparable<Sea>, Serializable {
         return color;
     }
 
-    public String getCreationDate() {
+    public String getStringDate() {
         return creationDate;
+    }
+
+    public Date getDate() {
+        try {
+            return sdf.parse(creationDate);
+        } catch (ParseException e) {
+            return new Date();   //this will simply never happen I guess :^)
+        }
     }
 }

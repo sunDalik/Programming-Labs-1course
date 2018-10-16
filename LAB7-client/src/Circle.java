@@ -2,8 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Circle extends JButton {
-    private int opacity=255; //Непрозрачность
-    private Sea sea; //Каждому кружочку соответствует элемент коллекции
+    private Sea sea;
 
     Circle(Sea sea) {
         this.sea = sea;
@@ -14,7 +13,6 @@ public class Circle extends JButton {
         this.setToolTipText(sea.getName());
     }
 
-    //Делаем форму круга
     @Override
     public void paintComponent(Graphics g) {
         g.setColor(sea.getColor().getRgbColor());
@@ -22,14 +20,4 @@ public class Circle extends JButton {
 
     }
 
-    public void rebounds() {
-        setBounds(sea.getX(), sea.getY(), ((Double)sea.getSize()).intValue(), ((Double)sea.getSize()).intValue());
-    }
-    public int getOpacity() {return opacity;}
-
-    public void decrementOpacity(){opacity--;}
-
-    public void incrementOpacity() {opacity++;}
-
-    public void setOpacity(int opacity) {this.opacity=opacity;}
 }

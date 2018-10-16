@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,11 +10,36 @@ class GUI extends JFrame {
 
     static private JLabel connectionText;
     private JPanel p3;
+    private Circle[] circleList;
+    private Circle[] filteredCircles;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
     private Connector connector;
+    private JLabel filtersText;
+    private JCheckBox blueCheckBox;
+    private JCheckBox sapphireCheckBox;
+    private JCheckBox navyCheckBox;
+    private JCheckBox cyanCheckBox;
+    private JCheckBox mintCheckBox;
+    private JCheckBox emeraldCheckBox;
+    private JTextField nameField;
+    private JTextField sizeFrom;
+    private JTextField sizeTo;
+    private JTextField powerFrom;
+    private JTextField powerTo;
+    private JTextField dateFrom;
+    private JTextField dateTo;
+    private JSlider xFromSlider;
+    private JSlider xToSlider;
+    private JSlider yFromSlider;
+    private JSlider yToSlider;
+    JButton startButton;
+    JButton stopButton;
+    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
 
     GUI(Connector connector) {
         this.connector = connector;
+        sdf.setLenient(false);
         //Top panel elements
         JLabel hoText = new JLabel(" Highlighted Object - ");
         JLabel nameText = new JLabel("Name:");
@@ -46,58 +73,72 @@ class GUI extends JFrame {
         connectionText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection).start());
-        JLabel filtersText = new JLabel();
+        filtersText = new JLabel();
         filtersText.setBackground(Color.BLACK);
         filtersText.setOpaque(true);
         filtersText.setText(" I wonder what will happen...");
         filtersText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         filtersText.setForeground(Color.GREEN);
         JLabel colorText2 = new JLabel("Color:");
-        JCheckBox blueCheckBox = new JCheckBox("Blue");
-        JCheckBox sapphireCheckBox = new JCheckBox("Sapphire");
-        JCheckBox navyCheckBox = new JCheckBox("Navy");
-        JCheckBox cyanCheckBox = new JCheckBox("Cyan");
-        JCheckBox mintCheckBox = new JCheckBox("Mint");
-        JCheckBox emeraldCheckBox = new JCheckBox("Emerald");
+        blueCheckBox = new JCheckBox("Blue");
+        sapphireCheckBox = new JCheckBox("Sapphire");
+        navyCheckBox = new JCheckBox("Navy");
+        cyanCheckBox = new JCheckBox("Cyan");
+        mintCheckBox = new JCheckBox("Mint");
+        emeraldCheckBox = new JCheckBox("Emerald");
+        blueCheckBox.setSelected(true);
+        sapphireCheckBox.setSelected(true);
+        navyCheckBox.setSelected(true);
+        cyanCheckBox.setSelected(true);
+        mintCheckBox.setSelected(true);
+        emeraldCheckBox.setSelected(true);
         JLabel nameStarts = new JLabel("Name starts with:");
-        JTextField nameField = new JTextField();
-        JTextField sizeFrom = new JTextField();
+        nameField = new JTextField();
+        sizeFrom = new JTextField();
         JLabel sizeFromTo = new JLabel("< size <");
-        JTextField sizeTo = new JTextField();
-        JTextField powerFrom = new JTextField();
+        sizeTo = new JTextField();
+        powerFrom = new JTextField();
         JLabel powerFromTo = new JLabel("< power <");
-        JTextField powerTo = new JTextField();
-        JTextField dateFrom = new JTextField();
+        powerTo = new JTextField();
+        dateFrom = new JTextField();
+        dateFrom.setToolTipText("format: dd-MM-yyyy");
         JLabel dateFromTo = new JLabel("< date <");
-        JTextField dateTo = new JTextField();
+        dateTo = new JTextField();
+        dateTo.setToolTipText("format: dd-MM-yyyy");
         JLabel xFromTo = new JLabel("X:");
-        JSlider xFromSlider = new JSlider();
+        xFromSlider = new JSlider();
         xFromSlider.setMinimum(-1000);
         xFromSlider.setMaximum(1000);
-        JLabel xFrom = new JLabel("0");
+        xFromSlider.setValue(-1000);
+        JLabel xFrom = new JLabel("-1000");
         xFromSlider.addChangeListener(e -> xFrom.setText(Integer.toString(xFromSlider.getValue())));
-        JSlider xToSlider = new JSlider();
+        xToSlider = new JSlider();
         xToSlider.setMinimum(-1000);
         xToSlider.setMaximum(1000);
-        JLabel xTo = new JLabel("0");
+        xToSlider.setValue(1000);
+        JLabel xTo = new JLabel("1000");
         xToSlider.addChangeListener(e -> xTo.setText(Integer.toString(xToSlider.getValue())));
         JLabel yFromTo = new JLabel("Y:");
-        JSlider yFromSlider = new JSlider();
+        yFromSlider = new JSlider();
         yFromSlider.setMinimum(-1000);
         yFromSlider.setMaximum(1000);
-        JLabel yFrom = new JLabel("0");
+        yFromSlider.setValue(-1000);
+        JLabel yFrom = new JLabel("-1000");
         yFromSlider.addChangeListener(e -> yFrom.setText(Integer.toString(yFromSlider.getValue())));
-        JSlider yToSlider = new JSlider();
+        yToSlider = new JSlider();
         yToSlider.setMinimum(-1000);
         yToSlider.setMaximum(1000);
-        JLabel yTo = new JLabel("0");
+        yToSlider.setValue(1000);
+        JLabel yTo = new JLabel("1000");
         yToSlider.addChangeListener(e -> yTo.setText(Integer.toString(yToSlider.getValue())));
         xFrom.setPreferredSize(new Dimension(35, 20));
         xTo.setPreferredSize(new Dimension(35, 20));
         yFrom.setPreferredSize(new Dimension(35, 20));
         yTo.setPreferredSize(new Dimension(35, 20));
-        JButton startButton = new JButton("Start");
-        JButton stopButton = new JButton("Stop");
+        startButton = new JButton("Start");
+        startButton.addActionListener(args0 -> new Thread(this::checkFilters).start());
+        stopButton = new JButton("Stop");
+        stopButton.setEnabled(false);
 
         //Panels
         JPanel p17 = new JPanel();
@@ -325,17 +366,107 @@ class GUI extends JFrame {
         }
     }
 
+    private void checkFilters() {
+        startButton.setEnabled(false);
+        if ((notANumeric(sizeFrom.getText()) && !sizeFrom.getText().isEmpty()) || (notANumeric(sizeTo.getText()) && !sizeTo.getText().isEmpty())) {
+            setFiltersText("Size must be a number!", true);
+            startButton.setEnabled(true);
+        } else if ((notANumeric(powerFrom.getText()) && !powerFrom.getText().isEmpty()) || (notANumeric(powerTo.getText()) && !powerTo.getText().isEmpty())) {
+            setFiltersText("Power must be a number!", true);
+            startButton.setEnabled(true);
+        } else {
+            try {
+                if (!dateFrom.getText().isEmpty()) {
+                    sdf.parse(dateFrom.getText());
+                }
+                if (!dateTo.getText().isEmpty()) {
+                    sdf.parse(dateTo.getText());
+                }
+                setFiltersText("Filters are correct", false);
+                applyFilters();
+            } catch (ParseException e) {
+                setFiltersText("Date format is dd-MM-yyyy!", true);
+                startButton.setEnabled(true);
+            }
+        }
+    }
+
+    private boolean notANumeric(String str) {
+        return !str.matches("-?\\d+(\\.\\d+)?");
+    }
+
+    private void setFiltersText(String message, boolean isError) {
+        if (isError) filtersText.setForeground(Color.RED);
+        else filtersText.setForeground(Color.GREEN);
+        filtersText.setText(" " + message);
+    }
+
+    private void applyFilters() {
+        filteredCircles = new Circle[seaList.size()];
+        for (int i = 0; i < seaList.size(); i++) {
+            Sea sea = seaList.get(i);
+            if (sea.getY() >= yFromSlider.getValue())
+                if (sea.getY() <= yToSlider.getValue()) {
+                    if (sea.getX() >= xFromSlider.getValue())
+                        if (sea.getX() <= xToSlider.getValue()) {
+                            boolean dateCheck = false;
+                            try {
+                                if (sea.getDate().after(sdf.parse(dateFrom.getText())))
+                                    if (sea.getDate().before(sdf.parse(dateTo.getText()))) {
+                                        dateCheck = true;
+                                    }
+                            } catch (ParseException e) {
+                                setFiltersText("Date format is dd-MM-yyyy", true);
+                            }
+                            if (dateCheck)
+                                if (sea.getPower() >= Integer.parseInt(powerFrom.getText())) {
+                                    if (sea.getPower() <= Integer.parseInt(powerTo.getText())) {
+                                        if (sea.getSize() >= Double.parseDouble(sizeFrom.getText()))
+                                            if (sea.getSize() <= Double.parseDouble(sizeTo.getText())) {
+                                                if (sea.getName().startsWith(nameField.getText())) {
+                                                    if (sea.getColor().name().equals(blueCheckBox.getText()) ||
+                                                            sea.getColor().name().equals(sapphireCheckBox.getText()) ||
+                                                            sea.getColor().name().equals(navyCheckBox.getText()) ||
+                                                            sea.getColor().name().equals(cyanCheckBox.getText()) ||
+                                                            sea.getColor().name().equals(mintCheckBox.getText()) ||
+                                                            sea.getColor().name().equals(emeraldCheckBox.getText())) {
+                                                        filteredCircles[i] = circleList[i];
+                                                    }
+                                                }
+                                            }
+                                    }
+                                }
+                        }
+                }
+        }
+        if (filteredCircles.length == 0){
+            startButton.setEnabled(true);
+            setFiltersText("No objects found", false);
+        }
+        else {
+            stopButton.setEnabled(true);
+            setFiltersText(filteredCircles.length + " object" + (filteredCircles.length == 1? "":"s") + " found", false);
+            
+        }
+    }
+
     private void refreshCollection() {
         List<Sea> tempSeaList = connector.getCollection();
         if (tempSeaList != null) {
             seaList = tempSeaList;
-            Circle[] circleList = new Circle[seaList.size()];
+            circleList = new Circle[seaList.size()];
             p3.removeAll();
-            for (Sea sea : seaList) {
-                p3.add(new Circle(sea));
+            for (int i = 0; i < seaList.size(); i++) {
+                Circle c = new Circle(seaList.get(i));
+                circleList[i] = c;
+                p3.add(c);
             }
+            setFiltersText("Acquired collection of " + seaList.size() + " elements",false);
             p3.revalidate();
             p3.repaint();
+        }
+        else {
+            setFiltersText("Server is unavailable, please try again later",true);
         }
     }
 
@@ -344,9 +475,11 @@ class GUI extends JFrame {
             List<Sea> tempSeaList = connector.getCollection();
             if (tempSeaList != null) {
                 seaList = tempSeaList;
-                Circle[] circleList = new Circle[seaList.size()];
-                for (Sea sea : seaList) {
-                    p3.add(new Circle(sea));
+                circleList = new Circle[seaList.size()];
+                for (int i = 0; i < seaList.size(); i++) {
+                    Circle c = new Circle(seaList.get(i));
+                    circleList[i] = c;
+                    p3.add(c);
                 }
                 p3.revalidate();
                 p3.repaint();
