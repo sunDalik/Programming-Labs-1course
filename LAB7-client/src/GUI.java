@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,7 +9,9 @@ import java.util.List;
 class GUI extends JFrame {
 
     static private JLabel connectionText;
+    private JPanel p3;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
+    private Circle[] circlesList;
     private Connector connector;
 
     GUI(Connector connector) {
@@ -243,8 +247,8 @@ class GUI extends JFrame {
         p4extended.add(p4);
         p4extended.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        JPanel p3 = new JPanel();
-        p3.setLayout(new BorderLayout());
+        p3 = new JPanel();
+        p3.setLayout(null);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
@@ -311,7 +315,7 @@ class GUI extends JFrame {
         setSize(1000, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
-        refreshCollection();
+        firstTimeRefresh();
     }
 
     static void setConnectionInfo(boolean isWorking) {
@@ -324,10 +328,38 @@ class GUI extends JFrame {
         }
     }
 
-    private void refreshCollection(){
+    private void refreshCollection() {
         List<Sea> tempSeaList = connector.getCollection();
-        if (tempSeaList != null){
+        if (tempSeaList != null) {
             seaList = tempSeaList;
+            circlesList = new Circle[seaList.size()];
+            for (int i = 0; i < seaList.size(); i++) {
+                Object[] seaData = seaList.get(i).toArray();
+                circlesList[i] = (new Circle(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue(), ((Double)seaData[1]).intValue(),  ((Colors) seaData[5]).getRgbColor()));            }
+        }
+    }
+
+    private void firstTimeRefresh() {
+        while (true) {
+            List<Sea> tempSeaList = connector.getCollection();
+            if (tempSeaList != null) {
+                seaList = tempSeaList;
+                circlesList = new Circle[seaList.size()];
+                p3.repaint();
+
+                for (int i = 0; i < seaList.size(); i++) {
+                    Object[] seaData = seaList.get(i).toArray();
+                    circlesList[i] = (new Circle(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue(), ((Double)seaData[1]).intValue(),  ((Colors) seaData[5]).getRgbColor()));
+                    circlesList[i].setLocation(((Double)seaData[3]).intValue(), ((Double)seaData[4]).intValue());
+                    circlesList[i].setSize( ((Double)seaData[1]).intValue(), ((Double)seaData[1]).intValue());
+
+                    p3.add(circlesList[i]);
+                    this.repaint();
+
+                }
+                GUI.this.revalidate();
+                break;
+            }
         }
     }
 }
