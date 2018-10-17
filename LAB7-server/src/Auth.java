@@ -104,18 +104,11 @@ public class Auth {
 
     private void work() {
         frame.setVisible(false);
-        frame.removeAll();
+        frame.dispose();
         sm = new SeaManager("collection.csv", new GUI());
         sm.load();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> sm.save()));
-        try (ServerSocket server = new ServerSocket(11037)) {
-            while (true) {
-                Socket client = server.accept();
-                new Thread(new RequestsHandler(sm, client)).start();
-            }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        new NetworkHandler(sm).execute();
     }
 
     private void addUser() {
