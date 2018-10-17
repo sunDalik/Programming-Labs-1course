@@ -56,35 +56,35 @@ public class Sea implements Comparable<Sea>, Serializable {
         return Double.compare(size, o.size);
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public double getSize() {
+    double getSize() {
         return size;
     }
 
-    public int getPower() {
+    int getPower() {
         return power;
     }
 
-    public int getX() {
+    int getX() {
         return x;
     }
 
-    public int getY() {
+    int getY() {
         return y;
     }
 
-    public Colors getColor() {
+    Colors getColor() {
         return color;
     }
 
-    public String getStringDate() {
+    String getStringDate() {
         return creationDate;
     }
 
-    public Date getDate() {
+    Date getDate() {
         try {
             return sdf.parse(creationDate);
         } catch (ParseException e) {

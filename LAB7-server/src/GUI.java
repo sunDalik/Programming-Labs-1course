@@ -123,7 +123,7 @@ class GUI extends JFrame {
 
         //Layout
         JPanel p6 = new JPanel();
-        p6.setLayout(new GridLayout(3,2,18,10));
+        p6.setLayout(new GridLayout(3, 2, 18, 10));
         p6.add(remove_greater_button);
         p6.add(remove_first_button);
         p6.add(remove_last_button);
@@ -132,7 +132,7 @@ class GUI extends JFrame {
         p6.add(add_button);
 
         JPanel p7 = new JPanel();
-        p7.setLayout(new GridLayout(4,2,10,8));
+        p7.setLayout(new GridLayout(4, 2, 10, 8));
         p7.add(p6);
         p7.add(colorText);
         p7.add(colorsbox);
@@ -146,7 +146,7 @@ class GUI extends JFrame {
         JPanel p8 = new JPanel();
         p8.setLayout(new BoxLayout(p8, BoxLayout.X_AXIS));
         p8.add(xText);
-        p8.add(Box.createRigidArea(new Dimension(50,0)));
+        p8.add(Box.createRigidArea(new Dimension(50, 0)));
         p8.add(xValue);
 
         JPanel p9 = new JPanel();
@@ -156,7 +156,7 @@ class GUI extends JFrame {
         JPanel p10 = new JPanel();
         p10.setLayout(new BoxLayout(p10, BoxLayout.X_AXIS));
         p10.add(yText);
-        p10.add(Box.createRigidArea(new Dimension(50,0)));
+        p10.add(Box.createRigidArea(new Dimension(50, 0)));
         p10.add(yValue);
 
         JPanel p11 = new JPanel();
@@ -165,29 +165,29 @@ class GUI extends JFrame {
 
         JPanel p5 = new JPanel();
         p5.setLayout(new BoxLayout(p5, BoxLayout.Y_AXIS));
-        p5.add(Box.createRigidArea(new Dimension(0,10)));
+        p5.add(Box.createRigidArea(new Dimension(0, 10)));
         p5.add(p6);
-        p5.add(Box.createRigidArea(new Dimension(0,15)));
+        p5.add(Box.createRigidArea(new Dimension(0, 15)));
         p5.add(p7);
-        p5.add(Box.createRigidArea(new Dimension(0,15)));
+        p5.add(Box.createRigidArea(new Dimension(0, 15)));
         p5.add(p8);
         p5.add(p9);
-        p5.add(Box.createRigidArea(new Dimension(0,20)));
+        p5.add(Box.createRigidArea(new Dimension(0, 20)));
         p5.add(p10);
         p5.add(p11);
-        p5.add(Box.createRigidArea(new Dimension(0,20)));
+        p5.add(Box.createRigidArea(new Dimension(0, 20)));
 
         JPanel p5extended = new JPanel();
         p5extended.setLayout(new BoxLayout(p5extended, BoxLayout.X_AXIS));
-        p5extended.add(Box.createRigidArea(new Dimension(10,0)));
+        p5extended.add(Box.createRigidArea(new Dimension(10, 0)));
         p5extended.add(p5);
-        p5extended.add(Box.createRigidArea(new Dimension(10,0)));
+        p5extended.add(Box.createRigidArea(new Dimension(10, 0)));
 
         JPanel p4 = new JPanel();
         p4.setLayout(new BorderLayout());
         p4.add(scrollPane, BorderLayout.CENTER);
-        p4.add(Box.createRigidArea(new Dimension(0,10)), BorderLayout.NORTH);
-        p4.add(Box.createRigidArea(new Dimension(0,10)), BorderLayout.SOUTH);
+        p4.add(Box.createRigidArea(new Dimension(0, 10)), BorderLayout.NORTH);
+        p4.add(Box.createRigidArea(new Dimension(0, 10)), BorderLayout.SOUTH);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BorderLayout());
@@ -198,7 +198,7 @@ class GUI extends JFrame {
         p1.add(p2, BorderLayout.SOUTH);
         p1.add(p5extended, BorderLayout.WEST);
         p1.add(p4, BorderLayout.CENTER);
-        p1.add(Box.createRigidArea(new Dimension(10,0)), BorderLayout.EAST);
+        p1.add(Box.createRigidArea(new Dimension(10, 0)), BorderLayout.EAST);
         add(p1);
 
         setTitle("Sea Collection Manager");
@@ -209,31 +209,27 @@ class GUI extends JFrame {
 
     /**
      * Executes command that require checking input values
+     *
      * @param command - add, add_if_min or remove_greater
      */
     private void checkInput(String command) {
         if (nameField.getText().isEmpty()) {
-            printToConsole("Name field is empty!",true);
-        }
-        else if (notANumeric(sizeField.getText())){
+            printToConsole("Name field is empty!", true);
+        } else if (notANumeric(sizeField.getText())) {
             printToConsole("Size value is not a number!", true);
-        }
-        else if (Double.parseDouble(sizeField.getText()) <= 0) {
+        } else if (Double.parseDouble(sizeField.getText()) <= 0) {
             printToConsole("Size can't be negative!", true);
-        }
-        else if (notANumeric(powerField.getText())){
+        } else if (notANumeric(powerField.getText())) {
             printToConsole("Power is not a number!", true);
-        }
-        else if ((int)Double.parseDouble(powerField.getText()) <= 0){
+        } else if ((int) Double.parseDouble(powerField.getText()) <= 0) {
             printToConsole("Power can't be negative", true);
-        }
-        else {
-            Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), xSlider.getValue(), ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
+        } else {
+            Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int) Double.parseDouble(powerField.getText()), xSlider.getValue(), ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
             switch (command) {
                 case "add":
                     Auth.sm.add(sea);
                     int r = new Random().nextInt(7);
-                    switch (r){
+                    switch (r) {
                         case 0:
                             printToConsole("Good job, Mr. God", false);
                             break;
@@ -259,7 +255,7 @@ class GUI extends JFrame {
                     break;
 
                 case "add_if_min":
-                    if (Auth.sm.add_if_min(sea)){
+                    if (Auth.sm.add_if_min(sea)) {
                         int r2 = new Random().nextInt(3);
                         switch (r2) {
                             case 0:
@@ -272,8 +268,7 @@ class GUI extends JFrame {
                                 printToConsole("s m a l l", false);
                                 break;
                         }
-                    }
-                    else {
+                    } else {
                         int r3 = new Random().nextInt(3);
                         switch (r3) {
                             case 0:
@@ -291,10 +286,9 @@ class GUI extends JFrame {
 
                 case "remove_greater":
                     int n = Auth.sm.remove_greater(sea);
-                    if (n == 0){
+                    if (n == 0) {
                         printToConsole("No sea can outdo the one you've entered...", false);
-                    }
-                    else {
+                    } else {
                         printToConsole(n + " great seas were completely disintegrated", false);
                     }
                     break;
@@ -304,23 +298,22 @@ class GUI extends JFrame {
 
     /**
      * Executes command that don't require entering values
+     *
      * @param command - sort, remove_first or remove_last
      */
-    private void dontCheckInput(String command){
-        switch (command){
+    private void dontCheckInput(String command) {
+        switch (command) {
             case ("sort"):
                 if (Auth.sm.sort()) {
                     printToConsole("Chaos is defeated...", false);
-                }
-                else {
+                } else {
                     printToConsole("The world is empty...", false);
                 }
                 break;
             case ("remove_first"):
                 if (Auth.sm.remove_first()) {
                     printToConsole("The original sea... It dried out!", false);
-                }
-                else {
+                } else {
                     printToConsole("No sea...", false);
                 }
                 break;
@@ -338,29 +331,34 @@ class GUI extends JFrame {
                             printToConsole("Some huge man has just drunk all the water in the last sea!", false);
                             break;
                     }
-                }
-                else {
+                } else {
                     printToConsole("I'm thirsty... God, bring us water!", false);
                 }
                 break;
         }
     }
 
-    void addToTable(Sea sea) { collectionModel.addRow(sea.toArray()); }
+    void addToTable(Sea sea) {
+        collectionModel.addRow(sea.toArray());
+    }
 
-    void removeLastRow() { collectionModel.removeRow(collectionModel.getRowCount() - 1);}
+    void removeLastRow() {
+        collectionModel.removeRow(collectionModel.getRowCount() - 1);
+    }
 
     /**
      * Deletes all rows from table and loads all elements from collection
+     *
      * @param seaList - collection to load
      */
-    void refreshTable(java.util.List<Sea> seaList){
+    void refreshTable(java.util.List<Sea> seaList) {
         collectionModel.setRowCount(0);
-        for (Sea sea: seaList) addToTable(sea);
+        for (Sea sea : seaList) addToTable(sea);
     }
 
     /**
      * Prints message to the window with operations result
+     *
      * @param message - literally message
      * @param isError - true - red color, false - green color
      */
@@ -373,6 +371,8 @@ class GUI extends JFrame {
         operationResult.setText(" " + message);
     }
 
-    private boolean notANumeric(String str) { return !str.matches("-?\\d+(\\.\\d+)?"); }
+    private boolean notANumeric(String str) {
+        return !str.matches("-?\\d+(\\.\\d+)?");
+    }
 
 }

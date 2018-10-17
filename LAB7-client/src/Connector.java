@@ -3,13 +3,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.SocketAddress;
 import java.nio.channels.SocketChannel;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Connector extends Thread {
 
-    private List<Sea> seas = Collections.synchronizedList(new LinkedList<>());
     private SocketAddress server;
 
     Connector(SocketAddress server) {
@@ -47,16 +44,15 @@ public class Connector extends Thread {
         }
     }
 
-    private SocketChannel connect() {
-        SocketChannel sc;
+    private void connect() {
         try {
-            sc = SocketChannel.open(server);
+            SocketChannel.open(server);
         } catch (IOException e) {
             GUI.setConnectionInfo(false);
             while (true) {
                 try {
                     Thread.sleep(1000);
-                    sc = SocketChannel.open(server);
+                    SocketChannel.open(server);
                     GUI.setConnectionInfo(true);
                     break;
                 } catch (InterruptedException ex) {
@@ -66,6 +62,5 @@ public class Connector extends Thread {
                 }
             }
         }
-        return sc;
     }
 }

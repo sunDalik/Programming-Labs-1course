@@ -4,19 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Auth {
+class Auth {
 
     static SeaManager sm;
     private JTextField loginField;
     private JPasswordField passwordField;
     private File usersData = new File("users.csv");
-    JFrame frame;
-    JLabel message;
+    private JFrame frame;
+    private JLabel message;
 
     Auth() {
         frame = new JFrame();
@@ -120,7 +118,7 @@ public class Auth {
             try {
                 Scanner sc = new Scanner(usersData);
                 String old = "";
-                while (sc.hasNextLine()){
+                while (sc.hasNextLine()) {
                     old += sc.nextLine() + "\n";
                 }
                 PrintWriter pw = new PrintWriter(usersData);
@@ -169,13 +167,13 @@ public class Auth {
     }
 
 
-    public String MD5(String md5) {
+    private String MD5(String md5) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            for (byte anArray : array) {
+                sb.append(Integer.toHexString((anArray & 0xFF) | 0x100), 1, 3);
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {

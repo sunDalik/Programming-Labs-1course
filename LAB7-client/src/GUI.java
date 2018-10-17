@@ -9,7 +9,7 @@ import java.util.List;
 class GUI extends JFrame {
 
     static private JLabel connectionText;
-    public JPanel p3;
+    JPanel p3;
     private ArrayList<Timer> timers;
     private Circle[] circleList;
     private ArrayList<Circle> filteredCircles;
@@ -493,7 +493,7 @@ class GUI extends JFrame {
         for (Timer timer : timers) {
             timer.cancel();
         }
-        for (Circle c : filteredCircles){
+        for (Circle c : filteredCircles) {
             c.setNormalColor();
         }
         p3.revalidate();

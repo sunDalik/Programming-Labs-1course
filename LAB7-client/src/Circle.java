@@ -29,11 +29,11 @@ public class Circle extends JButton {
         g.fillOval(0, 0, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
     }
 
-    private void rebound(){
+    private void rebound() {
         double k = 0.295;
         double k2 = 0.295;
-        double x = frame.p3.getWidth()/2.08 + sea.getX()*k;
-        double y = frame.p3.getHeight()/2.08 - sea.getY()*k2;
+        double x = frame.p3.getWidth() / 2.08 + sea.getX() * k;
+        double y = frame.p3.getHeight() / 2.08 - sea.getY() * k2;
         this.setBounds((int) x, (int) y, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
     }
 
