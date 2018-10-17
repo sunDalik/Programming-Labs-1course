@@ -16,6 +16,13 @@ class GUI extends JFrame {
     private Circle[] circleList;
     private ArrayList<Circle> filteredCircles;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
+    static private JTextField nameValue;
+    static private JTextField sizeValue;
+    static private JTextField powerValue;
+    static private JTextField xValue;
+    static private JTextField yValue;
+    static private JTextField colorValue;
+    static private JTextField dateValue;
     private Connector connector;
     private JLabel filtersText;
     private JCheckBox blueCheckBox;
@@ -44,7 +51,7 @@ class GUI extends JFrame {
         this.connector = connector;
         sdf.setLenient(false);
         //Top panel elements
-        JLabel hoText = new JLabel(" Highlighted Object - ");
+        JLabel hoText = new JLabel(" Object info - ");
         JLabel nameText = new JLabel("Name:");
         JLabel sizeText = new JLabel("Size:");
         JLabel powerText = new JLabel("Power:");
@@ -52,13 +59,13 @@ class GUI extends JFrame {
         JLabel yText = new JLabel("Y:");
         JLabel colorText = new JLabel("Color:");
         JLabel dateText = new JLabel("Creation Date:");
-        JTextField nameValue = new JTextField();
-        JTextField sizeValue = new JTextField();
-        JTextField powerValue = new JTextField();
-        JTextField xValue = new JTextField();
-        JTextField yValue = new JTextField();
-        JTextField colorValue = new JTextField();
-        JTextField dateValue = new JTextField();
+        nameValue = new JTextField();
+        sizeValue = new JTextField();
+        powerValue = new JTextField();
+        xValue = new JTextField();
+        yValue = new JTextField();
+        colorValue = new JTextField();
+        dateValue = new JTextField();
         nameValue.setEditable(false);
         sizeValue.setEditable(false);
         powerValue.setEditable(false);
@@ -291,20 +298,21 @@ class GUI extends JFrame {
         p4extended.add(Box.createRigidArea(new Dimension(10, 0)));
         p4extended.add(p4);
         p4extended.add(Box.createRigidArea(new Dimension(10, 0)));
+        p4extended.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, Color.BLACK));
 
         p3 = new JPanel();
         p3.setLayout(null);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
-        hoText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        nameText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        sizeText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        powerText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        xText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        yText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        colorText.setFont(new Font("Helvetica", Font.PLAIN, 16));
-        dateText.setFont(new Font("Helvetica", Font.PLAIN, 16));
+        hoText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        nameText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        sizeText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        powerText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        xText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        yText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        colorText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        dateText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         p2.add(hoText);
         p2.add(nameText);
         p2.add(Box.createRigidArea(new Dimension(10, 0)));
@@ -368,6 +376,16 @@ class GUI extends JFrame {
             connectionText.setForeground(Color.RED);
             connectionText.setText(" Server is unavailable");
         }
+    }
+
+    static void setTopPanelInfo(Sea sea) {
+        nameValue.setText(sea.getName());
+        sizeValue.setText(String.valueOf(sea.getSize()));
+        powerValue.setText(String.valueOf(sea.getPower()));
+        xValue.setText(String.valueOf(sea.getX()));
+        yValue.setText(String.valueOf(sea.getY()));
+        colorValue.setText(sea.getColor().name());
+        dateValue.setText(sea.getStringDate());
     }
 
     private void checkFilters() {

@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class Circle extends JButton {
     private Color color;
@@ -16,7 +18,7 @@ public class Circle extends JButton {
         setVisible(true);
         setBounds(sea.getX(), sea.getY(), ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
         this.setToolTipText(sea.getName());
-
+        this.addMouseListener(new setInfoOnClick());
     }
 
     @Override
@@ -26,7 +28,7 @@ public class Circle extends JButton {
 
     }
 
-    public void transition() {
+    void transition() {
         double ratio = (double) diff / (double) range;
         if (!isGoingWhite) {
             int red = (int) Math.abs((ratio * Color.WHITE.getRed()) + ((1 - ratio) * sea.getColor().getRgbColor().getRed()));
@@ -52,11 +54,18 @@ public class Circle extends JButton {
         }
     }
 
-    public void setNormalColor() {
+    void setNormalColor() {
         diff = 40;
         range = 40;
         isGoingWhite = true;
         color = sea.getColor().getRgbColor();
     }
 
+    class setInfoOnClick extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            GUI.setTopPanelInfo(sea);
+        }
+    }
 }
