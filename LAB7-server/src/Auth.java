@@ -124,7 +124,7 @@ public class Auth {
                     old += sc.nextLine() + "\n";
                 }
                 PrintWriter pw = new PrintWriter(usersData);
-                pw.write(old + loginField.getText() + "," + MD5(new String(passwordField.getPassword()) + "\n"));
+                pw.write(old + loginField.getText() + "," + MD5(new String(passwordField.getPassword())) + "\n");
                 pw.close();
                 work();
             } catch (FileNotFoundException e) {
@@ -144,8 +144,10 @@ public class Auth {
                 users.add(sc.next());
                 passwords.add(sc.next());
             }
+            String login = loginField.getText();
+            String password = MD5(new String(passwordField.getPassword()));
             for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).equals(loginField.getText()) && passwords.get(i).equals(MD5(new String(passwordField.getPassword())))) {
+                if (users.get(i).equals(login) && passwords.get(i).equals(password)) {
                     return true;
                 }
             }
