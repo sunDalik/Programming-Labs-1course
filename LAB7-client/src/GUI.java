@@ -1,8 +1,6 @@
 import javax.swing.*;
 import java.util.Timer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -11,7 +9,7 @@ import java.util.List;
 class GUI extends JFrame {
 
     static private JLabel connectionText;
-    private JPanel p3;
+    public JPanel p3;
     private ArrayList<Timer> timers;
     private Circle[] circleList;
     private ArrayList<Circle> filteredCircles;
@@ -511,7 +509,7 @@ class GUI extends JFrame {
             circleList = new Circle[seaList.size()];
             p3.removeAll();
             for (int i = 0; i < seaList.size(); i++) {
-                Circle c = new Circle(seaList.get(i));
+                Circle c = new Circle(seaList.get(i), this);
                 circleList[i] = c;
                 p3.add(c);
             }
@@ -530,7 +528,7 @@ class GUI extends JFrame {
                 seaList = tempSeaList;
                 circleList = new Circle[seaList.size()];
                 for (int i = 0; i < seaList.size(); i++) {
-                    Circle c = new Circle(seaList.get(i));
+                    Circle c = new Circle(seaList.get(i), this);
                     circleList[i] = c;
                     p3.add(c);
                 }

@@ -9,23 +9,32 @@ public class Circle extends JButton {
     private int range = diff;
     private boolean isGoingWhite = true;
     private Sea sea;
+    private GUI frame;
 
-    Circle(Sea sea) {
+    Circle(Sea sea, GUI frame) {
         this.sea = sea;
+        this.frame = frame;
         color = sea.getColor().getRgbColor();
         setBorder(null);
         setEnabled(false);
-        setVisible(true);
-        setBounds(sea.getX(), sea.getY(), ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
+        setBounds(0, 0, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
         this.setToolTipText(sea.getName());
         this.addMouseListener(new setInfoOnClick());
     }
 
     @Override
     public void paintComponent(Graphics g) {
+        rebound();
         g.setColor(color);
         g.fillOval(0, 0, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
+    }
 
+    private void rebound(){
+        double k = 0.295;
+        double k2 = 0.295;
+        double x = frame.p3.getWidth()/2.08 + sea.getX()*k;
+        double y = frame.p3.getHeight()/2.08 - sea.getY()*k2;
+        this.setBounds((int) x, (int) y, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
     }
 
     void transition() {
