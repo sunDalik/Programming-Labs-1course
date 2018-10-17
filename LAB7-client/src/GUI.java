@@ -1,16 +1,18 @@
 import javax.swing.*;
+import java.util.Timer;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 class GUI extends JFrame {
 
     static private JLabel connectionText;
     private JPanel p3;
+    private ArrayList<Timer> timers;
     private Circle[] circleList;
     private ArrayList<Circle> filteredCircles;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
@@ -33,8 +35,8 @@ class GUI extends JFrame {
     private JSlider xToSlider;
     private JSlider yFromSlider;
     private JSlider yToSlider;
-    JButton startButton;
-    JButton stopButton;
+    private JButton startButton;
+    private JButton stopButton;
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 
@@ -140,6 +142,7 @@ class GUI extends JFrame {
         startButton.addActionListener(args0 -> new Thread(this::checkFilters).start());
         stopButton = new JButton("Stop");
         stopButton.setEnabled(false);
+        stopButton.addActionListener(args0 -> new Thread(this::stopAnimation).start());
 
         //Panels
         JPanel p17 = new JPanel();
@@ -441,15 +444,46 @@ class GUI extends JFrame {
                         }
                 }
         }
-        if (filteredCircles.size() == 0){
+        if (filteredCircles.size() == 0) {
             startButton.setEnabled(true);
             setFiltersText("No objects found", false);
-        }
-        else {
+        } else {
             stopButton.setEnabled(true);
-            setFiltersText(filteredCircles.size() + " object" + (filteredCircles.size() == 1? "":"s") + " found", false);
+            setFiltersText(filteredCircles.size() + " object" + (filteredCircles.size() == 1 ? "" : "s") + " found", false);
+            timers = new ArrayList<>();
+            for (Circle circle : filteredCircles) {
+                timers.add(new Timer());
+                timers.get(timers.size() - 1).schedule(new TimerTask() {
+                    int counter = 0;
+
+                    @Override
+                    public void run() {
+                        circle.transition();
+                        p3.revalidate();
+                        p3.repaint();
+                        counter++;
+                        if (counter == 70) {
+                            stopAnimation();
+                        }
+                    }
+                }, 100, 100);
+
+            }
 
         }
+    }
+
+    private void stopAnimation() {
+        for (Timer timer : timers) {
+            timer.cancel();
+        }
+        for (Circle c : filteredCircles){
+            c.setNormalColor();
+        }
+        p3.revalidate();
+        p3.repaint();
+        startButton.setEnabled(true);
+        stopButton.setEnabled(false);
     }
 
     private void refreshCollection() {
@@ -463,12 +497,11 @@ class GUI extends JFrame {
                 circleList[i] = c;
                 p3.add(c);
             }
-            setFiltersText("Acquired collection of " + seaList.size() + " elements",false);
+            setFiltersText("Acquired collection of " + seaList.size() + " elements", false);
             p3.revalidate();
             p3.repaint();
-        }
-        else {
-            setFiltersText("Server is unavailable, please try again later",true);
+        } else {
+            setFiltersText("Server is unavailable, please try again later", true);
         }
     }
 
