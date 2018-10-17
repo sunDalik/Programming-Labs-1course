@@ -32,9 +32,9 @@ class GUI extends JFrame {
         file.add(import_item);
         file.add(save_item);
         file.add(exit_item);
-        load_item.addActionListener(arg0 -> Main.sm.load());
-        import_item.addActionListener(arg0 -> Main.sm.importCollection());
-        save_item.addActionListener(arg0 -> Main.sm.save());
+        load_item.addActionListener(arg0 -> Auth.sm.load());
+        import_item.addActionListener(arg0 -> Auth.sm.importCollection());
+        save_item.addActionListener(arg0 -> Auth.sm.save());
         exit_item.addActionListener(arg0 -> System.exit(0));
         menuBar.add(file);
         setJMenuBar(menuBar);
@@ -231,7 +231,7 @@ class GUI extends JFrame {
             Sea sea = new Sea(nameField.getText(), Double.parseDouble(sizeField.getText()), (int)Double.parseDouble(powerField.getText()), xSlider.getValue(), ySlider.getValue(), (Colors) colorsbox.getSelectedItem());
             switch (command) {
                 case "add":
-                    Main.sm.add(sea);
+                    Auth.sm.add(sea);
                     int r = new Random().nextInt(7);
                     switch (r){
                         case 0:
@@ -259,7 +259,7 @@ class GUI extends JFrame {
                     break;
 
                 case "add_if_min":
-                    if (Main.sm.add_if_min(sea)){
+                    if (Auth.sm.add_if_min(sea)){
                         int r2 = new Random().nextInt(3);
                         switch (r2) {
                             case 0:
@@ -290,7 +290,7 @@ class GUI extends JFrame {
                     break;
 
                 case "remove_greater":
-                    int n = Main.sm.remove_greater(sea);
+                    int n = Auth.sm.remove_greater(sea);
                     if (n == 0){
                         printToConsole("No sea can outdo the one you've entered...", false);
                     }
@@ -309,7 +309,7 @@ class GUI extends JFrame {
     private void dontCheckInput(String command){
         switch (command){
             case ("sort"):
-                if (Main.sm.sort()) {
+                if (Auth.sm.sort()) {
                     printToConsole("Chaos is defeated...", false);
                 }
                 else {
@@ -317,7 +317,7 @@ class GUI extends JFrame {
                 }
                 break;
             case ("remove_first"):
-                if (Main.sm.remove_first()) {
+                if (Auth.sm.remove_first()) {
                     printToConsole("The original sea... It dried out!", false);
                 }
                 else {
@@ -325,7 +325,7 @@ class GUI extends JFrame {
                 }
                 break;
             case ("remove_last"):
-                if (Main.sm.remove_last()) {
+                if (Auth.sm.remove_last()) {
                     int r = new Random().nextInt(3);
                     switch (r) {
                         case 0:
