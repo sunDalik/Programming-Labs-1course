@@ -13,6 +13,9 @@ public class Connector extends Thread {
         this.server = server;
     }
 
+    /**
+     * Trying to connect infinitely to notify user when server is off without refreshing
+     */
     @Override
     public void run() {
         connect();

@@ -37,6 +37,11 @@ public class Circle extends JButton {
         this.setBounds((int) x, (int) y, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
     }
 
+
+    /**
+     * makes circle whiter after 40 calls. Then it becomes normal after 30 calls.
+     * used for making animation
+     */
     void transition() {
         double ratio = (double) diff / (double) range;
         if (!isGoingWhite) {

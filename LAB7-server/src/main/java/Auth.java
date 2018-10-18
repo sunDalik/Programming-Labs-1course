@@ -25,7 +25,7 @@ class Auth {
         passwordText.setHorizontalAlignment(SwingConstants.CENTER);
         message = new JLabel();
         message.setForeground(Color.RED);
-        message.setPreferredSize(new Dimension(250, 20));
+        message.setPreferredSize(new Dimension(260, 20));
 
         loginField = new JTextField();
         loginField.setPreferredSize(new Dimension(100, 20));
