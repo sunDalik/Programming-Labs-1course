@@ -1,0 +1,35 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'Main'
+
+jar {
+  baseName = 'lab7server'
+  version = '1.0.0'
+  manifest {
+    attributes "Main-Class": "$mainClassName"
+  }
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+}
+
+compileJava {
+  options.fork = true
+  options.forkOptions.executable = 'javac'
+}
