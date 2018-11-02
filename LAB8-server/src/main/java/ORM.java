@@ -14,6 +14,11 @@ public class ORM {
     static Connection conn = null;
     static Statement stmt = null;
 
+    /* TODO:
+     Update:
+     UPDATE seas SET field1 = ?, field2 = ?, field3 = ? WHERE id = ?
+     */
+
     public static void main(String[] args) {
         //createTable(SeaTable.class);
         try {
@@ -27,19 +32,43 @@ public class ORM {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        List<SeaTable> l = selectAll(SeaTable.class);
-        for (SeaTable element: l){
-            System.out.println(element.getName());
-        } //aIOFHUEJKLEDJSOIL;dikewomlksjfnawklslidjlk
-}
+        delete(new SeaTable());
+    }
 
-    public static void createTable(Class<?> tableClass) {
-        try {
-            stmt.executeUpdate(createTableSql(tableClass));
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public static <T> void update(T record) {
+
+    }
+
+    public static <T> void delete(T record) {
+        Table table = record.getClass().getDeclaredAnnotation(Table.class);
+        if (table == null) {
+            throw new IllegalArgumentException("No @Table annotation found.");
+        }
+        String sql = "DELETE FROM " + table.name() + " WHERE ";
+        Field idField = null;
+        for (Field field: record.getClass().getDeclaredFields()){
+            if (field.isAnnotationPresent(Id.class)){
+                idField = field;
+                break;
+            }
+        }
+        if (idField == null){
+            throw new IllegalArgumentException("No @Id annotation found");
+        }
+        else if (!idField.isAnnotationPresent(Column.class)){
+            throw new IllegalArgumentException("No @Column annotation found");
+        }
+        else {
+            idField.setAccessible(true);
+            try {
+                sql += idField.getAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
+                stmt.executeUpdate(sql);
+            } catch (SQLException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     public static <T> List<T> selectAll(Class<T> tableClass) {
         Table table = tableClass.getDeclaredAnnotation(Table.class);
@@ -54,17 +83,17 @@ public class ORM {
                 .map(field -> field.getAnnotation(Column.class).name())
                 .collect(Collectors.joining(", "));
         try {
-            ResultSet rs = stmt.executeQuery("SELECT " + fieldNames +" FROM " + table.name());
+            ResultSet rs = stmt.executeQuery("SELECT " + fieldNames + " FROM " + table.name() + ";");
             List<T> list = new LinkedList<>();
-            while (rs.next()){
+            while (rs.next()) {
                 T record = tableClass.newInstance();
                 for (int i = 0; i < fields.size(); i++) {
                     Field field = fields.get(i);
                     field.setAccessible(true);
                     Object cell = rs.getObject(i + 1);
-                    cell = cell.equals("NULL")? null : cell;
+                    cell = cell.equals("NULL") ? null : cell;
                     if (field.getType().isEnum() && cell != null) {
-                        cell = Enum.valueOf((Class)field.getType(), cell.toString());
+                        cell = Enum.valueOf((Class) field.getType(), cell.toString());
                     }
                     field.set(record, cell);
                 }
@@ -77,6 +106,7 @@ public class ORM {
             return null;
         }
     }
+
     /*
     INSERT INTO seas (name, size, power, x, y, color, creation_date)
     VALUES ('name', size, power, x, y, 'color', 'creation_date');
@@ -97,7 +127,7 @@ public class ORM {
         String fieldValues = fields.stream()
                 .map(field -> "?")
                 .collect(Collectors.joining(", "));
-        sql += fieldNames + ")\nVALUES (" + fieldValues + ")";
+        sql += fieldNames + ")\nVALUES (" + fieldValues + ");";
 
         try {
             PreparedStatement sqlStatement = conn.prepareStatement(sql);
@@ -106,8 +136,7 @@ public class ORM {
                 Object obj = fields.get(i).get(record);
                 if (fields.get(i).getType().isEnum() && obj != null) {
                     obj = obj.toString();
-                }
-                else sqlStatement.setObject(i + 1, obj == null ? "NULL" : obj);
+                } else sqlStatement.setObject(i + 1, obj == null ? "NULL" : obj);
             }
             sqlStatement.execute();
         } catch (SQLException | IllegalAccessException e) {
@@ -117,7 +146,7 @@ public class ORM {
         System.out.println(sql);
     }
 
-    public static String createTableSql(Class<?> tableClass) {
+    public static void createTableSql(Class<?> tableClass) {
         Table table = tableClass.getDeclaredAnnotation(Table.class);
         if (table == null) {
             throw new IllegalArgumentException("No @Table annotation found.");
@@ -162,6 +191,10 @@ public class ORM {
                         return name + " SERIAL PRIMARY KEY";
                     } else return name + type;
                 }).collect(Collectors.joining(",\n"));
-        return "CREATE TABLE " + table.name() + "(\n" + fields + "\n);";
+        try {
+            stmt.executeUpdate("CREATE TABLE " + table.name() + "(\n" + fields + "\n);");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

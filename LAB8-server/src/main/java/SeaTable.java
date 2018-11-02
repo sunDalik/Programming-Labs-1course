@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 public class SeaTable implements Serializable {
     @Id
     @Column(name = "sea_id")
-    private int id;
+    private int id = 2;
 
     @Column(name = "name")
     private String name;
