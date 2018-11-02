@@ -14,11 +14,6 @@ public class ORM {
     static Connection conn = null;
     static Statement stmt = null;
 
-    /* TODO:
-     Update:
-     UPDATE seas SET field1 = ?, field2 = ?, field3 = ? WHERE id = ?
-     */
-
     public static void main(String[] args) {
         //createTable(SeaTable.class);
         try {
@@ -32,36 +27,57 @@ public class ORM {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        delete(new SeaTable());
     }
 
-    public static <T> void update(T record) {
-
+    public static <T> void updateRecord(T record) {
+        Table table = record.getClass().getDeclaredAnnotation(Table.class);
+        if (table == null) {
+            throw new IllegalArgumentException("No @Table annotation found.");
+        }
+        Field idField = null;
+        for (Field field : record.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
+                idField = field;
+                break;
+            }
+        }
+        if (idField == null) {
+            throw new IllegalArgumentException("No @Id && @Column annotation found");
+        }
+        String sql = "UPDATE " + table.name() + " SET ";
+        sql += Arrays.stream(record.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                .map(field -> field.getDeclaredAnnotation(Column.class).name() + " = ?")
+                .collect(Collectors.joining(", "));
+        idField.setAccessible(true);
+        try {
+            sql += " WHERE " + idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        executePrepStmt(sql, record);
     }
 
-    public static <T> void delete(T record) {
+
+    public static <T> void deleteRecord(T record) {
         Table table = record.getClass().getDeclaredAnnotation(Table.class);
         if (table == null) {
             throw new IllegalArgumentException("No @Table annotation found.");
         }
         String sql = "DELETE FROM " + table.name() + " WHERE ";
         Field idField = null;
-        for (Field field: record.getClass().getDeclaredFields()){
-            if (field.isAnnotationPresent(Id.class)){
+        for (Field field : record.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
                 idField = field;
                 break;
             }
         }
-        if (idField == null){
-            throw new IllegalArgumentException("No @Id annotation found");
-        }
-        else if (!idField.isAnnotationPresent(Column.class)){
-            throw new IllegalArgumentException("No @Column annotation found");
-        }
-        else {
+        if (idField == null) {
+            throw new IllegalArgumentException("No @Id && @Column annotation found");
+        } else {
             idField.setAccessible(true);
             try {
-                sql += idField.getAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
+                sql += idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
                 stmt.executeUpdate(sql);
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
@@ -107,44 +123,26 @@ public class ORM {
         }
     }
 
-    /*
-    INSERT INTO seas (name, size, power, x, y, color, creation_date)
-    VALUES ('name', size, power, x, y, 'color', 'creation_date');
-     */
+
     public static <T> void insertRecord(T record) {
         Table table = record.getClass().getDeclaredAnnotation(Table.class);
         if (table == null) {
             throw new IllegalArgumentException("No @Table annotation found.");
         }
         String sql = "INSERT INTO " + table.name() + " (";
-
-        List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
+        sql += Arrays.stream(record.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
-                .collect(Collectors.toList());
-        String fieldNames = fields.stream()
                 .map(field -> field.getAnnotation(Column.class).name())
                 .collect(Collectors.joining(", "));
-        String fieldValues = fields.stream()
+        sql += ")\nVALUES (";
+        sql += Arrays.stream(record.getClass().getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
                 .map(field -> "?")
                 .collect(Collectors.joining(", "));
-        sql += fieldNames + ")\nVALUES (" + fieldValues + ");";
-
-        try {
-            PreparedStatement sqlStatement = conn.prepareStatement(sql);
-            for (int i = 0; i < fields.size(); i++) {
-                fields.get(i).setAccessible(true); // private
-                Object obj = fields.get(i).get(record);
-                if (fields.get(i).getType().isEnum() && obj != null) {
-                    obj = obj.toString();
-                } else sqlStatement.setObject(i + 1, obj == null ? "NULL" : obj);
-            }
-            sqlStatement.execute();
-        } catch (SQLException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(sql);
+        sql += ");";
+        executePrepStmt(sql, record);
     }
+
 
     public static void createTableSql(Class<?> tableClass) {
         Table table = tableClass.getDeclaredAnnotation(Table.class);
@@ -194,6 +192,26 @@ public class ORM {
         try {
             stmt.executeUpdate("CREATE TABLE " + table.name() + "(\n" + fields + "\n);");
         } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static public <T> void executePrepStmt(String sql, T record){
+        try {
+            List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                    .collect(Collectors.toList());
+            PreparedStatement prepStmt = conn.prepareStatement(sql);
+            for (int i = 0; i < fields.size(); i++) {
+                fields.get(i).setAccessible(true);
+                Object obj = fields.get(i).get(record);
+                if (fields.get(i).getType().isEnum() && obj != null) {
+                    obj = obj.toString();
+                }
+                prepStmt.setObject(i + 1, obj);
+            }
+            prepStmt.execute();
+        } catch (SQLException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
