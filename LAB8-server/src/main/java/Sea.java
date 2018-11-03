@@ -1,16 +1,53 @@
 import java.io.Serializable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Sea implements Comparable<Sea>, Serializable {
+@Retention(RetentionPolicy.RUNTIME)
+@interface Table{
+    String name();
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@interface  Id{
+
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@interface Column{
+    String name();
+}
+
+
+@Table(name = "seas")
+public class Sea implements Serializable, Comparable<Sea> {
+    @Id
+    @Column(name = "sea_id")
+    private Integer id;
+
+    @Column(name = "name")
     private String name;
-    private double size;
-    private int power;
-    private int x;
-    private int y;
+
+    @Column(name = "size")
+    private Double size;
+
+    @Column(name = "power")
+    private Integer power;
+
+    @Column(name = "x")
+    private Integer x;
+
+    @Column(name = "y")
+    private Integer y;
+
+    @Column(name = "color")
     private Colors color;
+
+    @Column(name = "creation_date")
     private String creationDate;
+
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     private static final long serialVersionUID = 78L;
 
@@ -28,9 +65,10 @@ public class Sea implements Comparable<Sea>, Serializable {
     }
 
     /**
-     * Is used to load element from file to collection
+     * Is used to load element from database to collection
      */
-    Sea(String name, double size, int power, int x, int y, Colors color, String creationDate) {
+    Sea(int id, String name, double size, int power, int x, int y, Colors color, String creationDate) {
+        this.id = id;
         this.name = name;
         this.size = size;
         this.power = power;

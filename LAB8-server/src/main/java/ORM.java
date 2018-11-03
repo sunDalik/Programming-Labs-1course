@@ -15,7 +15,7 @@ public class ORM {
     static Statement stmt = null;
 
     public static void main(String[] args) {
-        //createTable(SeaTable.class);
+        //createTable(Sea.class);
         try {
             Class.forName(JDBC_DRIVER);
         } catch (ClassNotFoundException e) {
@@ -45,8 +45,10 @@ public class ORM {
             throw new IllegalArgumentException("No @Id && @Column annotation found");
         }
         String sql = "UPDATE " + table.name() + " SET ";
-        sql += Arrays.stream(record.getClass().getDeclaredFields())
+        List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                .collect(Collectors.toList());
+        sql += fields.stream()
                 .map(field -> field.getDeclaredAnnotation(Column.class).name() + " = ?")
                 .collect(Collectors.joining(", "));
         idField.setAccessible(true);
@@ -55,7 +57,7 @@ public class ORM {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        executePrepStmt(sql, record);
+        executePrepStmt(sql, record, fields);
     }
 
 
@@ -124,23 +126,44 @@ public class ORM {
     }
 
 
-    public static <T> void insertRecord(T record) {
+    public static <T> int insertRecord(T record) {
         Table table = record.getClass().getDeclaredAnnotation(Table.class);
         if (table == null) {
             throw new IllegalArgumentException("No @Table annotation found.");
         }
         String sql = "INSERT INTO " + table.name() + " (";
-        sql += Arrays.stream(record.getClass().getDeclaredFields())
+        List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                .collect(Collectors.toList());
+        sql += fields.stream()
                 .map(field -> field.getAnnotation(Column.class).name())
                 .collect(Collectors.joining(", "));
         sql += ")\nVALUES (";
-        sql += Arrays.stream(record.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+        sql += fields.stream()
                 .map(field -> "?")
                 .collect(Collectors.joining(", "));
-        sql += ");";
-        executePrepStmt(sql, record);
+        Field idField = null;
+        for (Field field : record.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
+                idField = field;
+                break;
+            }
+        }
+        if (idField == null) {
+            throw new IllegalArgumentException("No @Id && @Column annotation found");
+        }
+        try {
+            idField.setAccessible(true);
+            sql += ") RETURNING (" + idField.get(record) + ");";
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        ResultSet rs = executePrepStmt(sql, record, fields);
+        try {
+            return (int) rs.getObject(1);
+        } catch (SQLException e) {
+            throw new RuntimeException("I have no idea what went wrong");
+        }
     }
 
 
@@ -196,11 +219,8 @@ public class ORM {
         }
     }
 
-    static public <T> void executePrepStmt(String sql, T record){
+    static public <T> ResultSet executePrepStmt(String sql, T record, List<Field> fields){
         try {
-            List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
-                    .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
-                    .collect(Collectors.toList());
             PreparedStatement prepStmt = conn.prepareStatement(sql);
             for (int i = 0; i < fields.size(); i++) {
                 fields.get(i).setAccessible(true);
@@ -210,9 +230,9 @@ public class ORM {
                 }
                 prepStmt.setObject(i + 1, obj);
             }
-            prepStmt.execute();
+            return prepStmt.executeQuery();
         } catch (SQLException | IllegalAccessException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Your SQL is wrong I guess?");
         }
     }
 }
