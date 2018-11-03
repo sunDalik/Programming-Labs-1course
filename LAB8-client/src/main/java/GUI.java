@@ -8,15 +8,17 @@ import java.util.List;
 
 class GUI extends JFrame {
 
-    private Locale rulocale = new Locale("ru", "RU");
-    private Locale enlocale = new Locale("en", "US");
-    private Locale eslocale = new Locale("es", "MX");
-    private Locale delocale = new Locale("de", "DE");
-    private Locale ltlocale = new Locale("lt", "LT");
     private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
     static private ResourceBundle staticBundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+    private JMenu language = new JMenu(bundle.getString("language"));
+    private Locale rulocale = new Locale("ru");
+    private Locale enlocale = new Locale("en");
+    private Locale eslocale = new Locale("es", "MX");
+    private Locale delocale = new Locale("de");
+    private Locale ltlocale = new Locale("lt");
 
     private static JLabel connectionText = new JLabel();
+    private static boolean isConnected = false;
     JPanel p3;
     private ArrayList<Timer> timers;
     private Circle[] circleList;
@@ -26,8 +28,6 @@ class GUI extends JFrame {
     private JLabel nameText = new JLabel(bundle.getString("name") + ":");
     private JLabel sizeText = new JLabel(bundle.getString("size") + ":");
     private JLabel powerText = new JLabel(bundle.getString("power") + ":");
-    private JLabel xText = new JLabel("X:");
-    private JLabel yText = new JLabel("Y:");
     private JLabel colorText = new JLabel(bundle.getString("color") + ":");
     private JLabel dateText = new JLabel(bundle.getString("creationDate") + ":");
     private JTextField nameValue = new JTextField();
@@ -39,7 +39,8 @@ class GUI extends JFrame {
     private JTextField dateValue = new JTextField();
     private Connector connector;
     private JButton refreshButton = new JButton(bundle.getString("refresh"));
-    private JLabel filtersText;
+    private JLabel filtersText = new JLabel(bundle.getString("greeting"));
+    private int filtersTextNumber = 0; //Number of phrase in filtersText. Necessary for language changing.
     //colorText2 should look like "Color:" so this code capitalizes first letter
     private JLabel colorText2 = new JLabel(bundle.getString("color").substring(0, 1).toUpperCase() + bundle.getString("color").substring(1) + ":");
     private JCheckBox blueCheckBox = new JCheckBox(bundle.getString("blue"));
@@ -50,13 +51,13 @@ class GUI extends JFrame {
     private JCheckBox emeraldCheckBox = new JCheckBox(bundle.getString("emerald"));
     private JLabel nameStarts = new JLabel(bundle.getString("nameFilter"));
     private JTextField nameField = new JTextField();
-    private JLabel sizeFromTo = new JLabel("< " +bundle.getString("size") + " <");
+    private JLabel sizeFromTo = new JLabel("< " + bundle.getString("size") + " <");
     private JTextField sizeFrom = new JTextField();
     private JTextField sizeTo = new JTextField();
-    private JLabel powerFromTo = new JLabel("< " +bundle.getString("power") + " <");
+    private JLabel powerFromTo = new JLabel("< " + bundle.getString("power") + " <");
     private JTextField powerFrom = new JTextField();
     private JTextField powerTo = new JTextField();
-    private JLabel dateFromTo = new JLabel("< " +bundle.getString("date") + " <");
+    private JLabel dateFromTo = new JLabel("< " + bundle.getString("date") + " <");
     private JTextField dateFrom = new JTextField();
     private JTextField dateTo = new JTextField();
     private JLabel from1 = new JLabel(bundle.getString("from") + ":");
@@ -75,6 +76,8 @@ class GUI extends JFrame {
     GUI(Connector connector) {
         this.connector = connector;
         sdf.setLenient(false);
+        JLabel xText = new JLabel("x:");
+        JLabel yText = new JLabel("y:");
         nameValue.setEditable(false);
         sizeValue.setEditable(false);
         powerValue.setEditable(false);
@@ -83,6 +86,28 @@ class GUI extends JFrame {
         colorValue.setEditable(false);
         dateValue.setEditable(false);
 
+        JMenuBar menuBar = new JMenuBar();
+        UIManager.put("Menu.font", new Font("Helvetica", Font.PLAIN, 16));
+        UIManager.put("MenuItem.font", new Font("Helvetica", Font.PLAIN, 16));
+        UIManager.put("TextField.font", new Font("Helvetica", Font.PLAIN, 15));
+        JMenuItem en_item = new JMenuItem("English");
+        JMenuItem ru_item = new JMenuItem("Русский");
+        JMenuItem es_item = new JMenuItem("Español");
+        JMenuItem de_item = new JMenuItem("Deutsch");
+        JMenuItem lt_item = new JMenuItem("Lietuvių");
+        language.add(en_item);
+        language.add(ru_item);
+        language.add(es_item);
+        language.add(de_item);
+        language.add(lt_item);
+        en_item.addActionListener(arg0 -> changeLanguage(enlocale));
+        ru_item.addActionListener(arg0 -> changeLanguage(rulocale));
+        es_item.addActionListener(arg0 -> changeLanguage(eslocale));
+        de_item.addActionListener(arg0 -> changeLanguage(delocale));
+        lt_item.addActionListener(arg0 -> changeLanguage(ltlocale));
+        menuBar.add(language);
+        setJMenuBar(menuBar);
+
         //Right panel elements
         connectionText.setBackground(Color.BLACK);
         connectionText.setOpaque(true);
@@ -90,10 +115,8 @@ class GUI extends JFrame {
         connectionText.setBackground(Color.BLACK);
         connectionText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection).start());
-        filtersText = new JLabel();
         filtersText.setBackground(Color.BLACK);
         filtersText.setOpaque(true);
-        filtersText.setText(" I wonder what will happen...");
         filtersText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         filtersText.setForeground(Color.GREEN);
         blueCheckBox.setSelected(true);
@@ -353,6 +376,7 @@ class GUI extends JFrame {
     }
 
     static void setConnectionInfo(boolean isWorking) {
+        isConnected = isWorking;
         if (isWorking) {
             connectionText.setForeground(Color.GREEN);
             connectionText.setText(" " + staticBundle.getString("connected"));
@@ -375,10 +399,12 @@ class GUI extends JFrame {
     private void checkFilters() {
         startButton.setEnabled(false);
         if ((notANumeric(sizeFrom.getText()) && !sizeFrom.getText().isEmpty()) || (notANumeric(sizeTo.getText()) && !sizeTo.getText().isEmpty())) {
-            setFiltersText("Size must be a number!", true);
+            setFiltersText(bundle.getString("incorrectSize"), true);
+            filtersTextNumber = 1;
             startButton.setEnabled(true);
         } else if ((notANumeric(powerFrom.getText()) && !powerFrom.getText().isEmpty()) || (notANumeric(powerTo.getText()) && !powerTo.getText().isEmpty())) {
-            setFiltersText("Power must be a number!", true);
+            setFiltersText(bundle.getString("incorrectPower"), true);
+            filtersTextNumber = 2;
             startButton.setEnabled(true);
         } else {
             try {
@@ -388,10 +414,12 @@ class GUI extends JFrame {
                 if (!dateTo.getText().isEmpty()) {
                     sdf.parse(dateTo.getText());
                 }
-                setFiltersText("Filters are correct", false);
+                setFiltersText(bundle.getString("filtersCorrect"), false);
+                filtersTextNumber = 4;
                 applyFilters();
             } catch (ParseException e) {
-                setFiltersText("Date format is dd-MM-yyyy!", true);
+                setFiltersText(bundle.getString("incorrectDate") + " dd-MM-yyyy!", true);
+                filtersTextNumber = 3;
                 startButton.setEnabled(true);
             }
         }
@@ -423,7 +451,8 @@ class GUI extends JFrame {
                                     }
                                 }
                             } catch (ParseException e) {
-                                setFiltersText("Date format is dd-MM-yyyy", true);
+                                setFiltersText(bundle.getString("incorrectDate") + " dd-MM-yyyy!", true);
+                                filtersTextNumber = 3;
                             }
                             if (dateCheck)
                                 if (powerFrom.getText().isEmpty() || sea.getPower() >= Integer.parseInt(powerFrom.getText())) {
@@ -448,10 +477,12 @@ class GUI extends JFrame {
         }
         if (filteredCircles.size() == 0) {
             startButton.setEnabled(true);
-            setFiltersText("No objects found", false);
+            setFiltersText(bundle.getString("noObjectsFound"), false);
+            filtersTextNumber = 5;
         } else {
             stopButton.setEnabled(true);
-            setFiltersText(filteredCircles.size() + " object" + (filteredCircles.size() == 1 ? "" : "s") + " found", false);
+            setFiltersText(filteredCircles.size() + " " + bundle.getString("objectsFound"), false);
+            filtersTextNumber = 6;
             timers = new ArrayList<>();
             for (Circle circle : filteredCircles) {
                 timers.add(new Timer());
@@ -469,9 +500,7 @@ class GUI extends JFrame {
                         }
                     }
                 }, 100, 100);
-
             }
-
         }
     }
 
@@ -499,11 +528,13 @@ class GUI extends JFrame {
                 circleList[i] = c;
                 p3.add(c);
             }
-            setFiltersText("Acquired collection of " + seaList.size() + " elements", false);
+            setFiltersText(bundle.getString("acquired") + " " + seaList.size() + " " + bundle.getString("elements"), false);
+            filtersTextNumber = 7;
             p3.revalidate();
             p3.repaint();
         } else {
-            setFiltersText("Server is unavailable, please try again later", true);
+            setFiltersText(bundle.getString("tryAgain"), true);
+            filtersTextNumber = 8;
         }
     }
 
@@ -525,9 +556,65 @@ class GUI extends JFrame {
         }
     }
 
-    private void changeLanguage (Locale locale){
-        bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
-        staticBundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
-        this.setTitle(bundle.getString("title1"));
+    private void changeLanguage(Locale locale) {
+        bundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
+        staticBundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
+        connectionText.setText(" " + (isConnected ? staticBundle.getString("connected") : staticBundle.getString("disconnected")));
+        setTitle(bundle.getString("title1"));
+        language.setText(bundle.getString("language"));
+        hoText.setText(bundle.getString("info") + " - ");
+        nameText.setText(bundle.getString("name") + ":");
+        sizeText.setText(bundle.getString("size") + ":");
+        powerText.setText(bundle.getString("power") + ":");
+        colorText.setText(bundle.getString("color") + ":");
+        dateText.setText(bundle.getString("creationDate") + ":");
+        refreshButton.setText(bundle.getString("refresh"));
+        colorText2.setText(bundle.getString("color").substring(0, 1).toUpperCase() + bundle.getString("color").substring(1) + ":");
+        blueCheckBox.setText(bundle.getString("blue"));
+        sapphireCheckBox.setText(bundle.getString("sapphire"));
+        navyCheckBox.setText(bundle.getString("navy"));
+        cyanCheckBox.setText(bundle.getString("cyan"));
+        mintCheckBox.setText(bundle.getString("mint"));
+        emeraldCheckBox.setText(bundle.getString("emerald"));
+        nameStarts.setText(bundle.getString("nameFilter"));
+        sizeFromTo.setText("< " + bundle.getString("size") + " <");
+        powerFromTo.setText("< " + bundle.getString("power") + " <");
+        dateFromTo.setText("< " + bundle.getString("date") + " <");
+        from1.setText(bundle.getString("from") + ":");
+        from2.setText(bundle.getString("from") + ":");
+        to1.setText(bundle.getString("to") + ":");
+        to2.setText(bundle.getString("to") + ":");
+        startButton.setText(bundle.getString("start"));
+        stopButton.setText(bundle.getString("stop"));
+
+        switch (filtersTextNumber){
+            case 0:
+                setFiltersText(bundle.getString("greeting"), false);
+                break;
+            case 1:
+                setFiltersText(bundle.getString("incorrectSize"), true);
+                break;
+            case 2:
+                setFiltersText(bundle.getString("incorrectPower"), true);
+                break;
+            case 3:
+                setFiltersText(bundle.getString("incorrectDate") + " dd-MM-yyyy!", true);
+                break;
+            case 4:
+                setFiltersText(bundle.getString("filtersCorrect"), false);
+                break;
+            case 5:
+                setFiltersText(bundle.getString("noObjectsFound"), false);
+                break;
+            case 6:
+                setFiltersText(filteredCircles.size() + " " + bundle.getString("objectsFound"), false);
+                break;
+            case 7:
+                setFiltersText(bundle.getString("acquired") + " " + seaList.size() + " " + bundle.getString("elements"), false);
+                break;
+            case 8:
+                setFiltersText(bundle.getString("tryAgain"), true);
+                break;
+        }
     }
 }

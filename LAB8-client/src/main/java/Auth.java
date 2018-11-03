@@ -8,11 +8,11 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 class Auth {
-    private Locale rulocale = new Locale("ru", "RU");
-    private Locale enlocale = new Locale("en", "US");
+    private Locale rulocale = new Locale("ru");
+    private Locale enlocale = new Locale("en");
     private Locale eslocale = new Locale("es", "MX");
-    private Locale delocale = new Locale("de", "DE");
-    private Locale ltlocale = new Locale("lt", "LT");
+    private Locale delocale = new Locale("de");
+    private Locale ltlocale = new Locale("lt");
     private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
 
     private JMenu language = new JMenu(bundle.getString("language"));
