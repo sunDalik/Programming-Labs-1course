@@ -8,62 +8,73 @@ import java.util.List;
 
 class GUI extends JFrame {
 
-    static private JLabel connectionText;
+    private Locale rulocale = new Locale("ru", "RU");
+    private Locale enlocale = new Locale("en", "US");
+    private Locale eslocale = new Locale("es", "MX");
+    private Locale delocale = new Locale("de", "DE");
+    private Locale ltlocale = new Locale("lt", "LT");
+    private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+    static private ResourceBundle staticBundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+
+    private static JLabel connectionText = new JLabel();
     JPanel p3;
     private ArrayList<Timer> timers;
     private Circle[] circleList;
     private ArrayList<Circle> filteredCircles;
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
-    static private JTextField nameValue;
-    static private JTextField sizeValue;
-    static private JTextField powerValue;
-    static private JTextField xValue;
-    static private JTextField yValue;
-    static private JTextField colorValue;
-    static private JTextField dateValue;
+    private JLabel hoText = new JLabel(bundle.getString("info") + " - ");
+    private JLabel nameText = new JLabel(bundle.getString("name") + ":");
+    private JLabel sizeText = new JLabel(bundle.getString("size") + ":");
+    private JLabel powerText = new JLabel(bundle.getString("power") + ":");
+    private JLabel xText = new JLabel("X:");
+    private JLabel yText = new JLabel("Y:");
+    private JLabel colorText = new JLabel(bundle.getString("color") + ":");
+    private JLabel dateText = new JLabel(bundle.getString("creationDate") + ":");
+    private JTextField nameValue = new JTextField();
+    private JTextField sizeValue = new JTextField();
+    private JTextField powerValue = new JTextField();
+    private JTextField xValue = new JTextField();
+    private JTextField yValue = new JTextField();
+    private JTextField colorValue = new JTextField();
+    private JTextField dateValue = new JTextField();
     private Connector connector;
+    private JButton refreshButton = new JButton(bundle.getString("refresh"));
     private JLabel filtersText;
-    private JCheckBox blueCheckBox;
-    private JCheckBox sapphireCheckBox;
-    private JCheckBox navyCheckBox;
-    private JCheckBox cyanCheckBox;
-    private JCheckBox mintCheckBox;
-    private JCheckBox emeraldCheckBox;
-    private JTextField nameField;
-    private JTextField sizeFrom;
-    private JTextField sizeTo;
-    private JTextField powerFrom;
-    private JTextField powerTo;
-    private JTextField dateFrom;
-    private JTextField dateTo;
-    private JSlider xFromSlider;
-    private JSlider xToSlider;
-    private JSlider yFromSlider;
-    private JSlider yToSlider;
-    private JButton startButton;
-    private JButton stopButton;
+    //colorText2 should look like "Color:" so this code capitalizes first letter
+    private JLabel colorText2 = new JLabel(bundle.getString("color").substring(0, 1).toUpperCase() + bundle.getString("color").substring(1) + ":");
+    private JCheckBox blueCheckBox = new JCheckBox(bundle.getString("blue"));
+    private JCheckBox sapphireCheckBox = new JCheckBox(bundle.getString("sapphire"));
+    private JCheckBox navyCheckBox = new JCheckBox(bundle.getString("navy"));
+    private JCheckBox cyanCheckBox = new JCheckBox(bundle.getString("cyan"));
+    private JCheckBox mintCheckBox = new JCheckBox(bundle.getString("mint"));
+    private JCheckBox emeraldCheckBox = new JCheckBox(bundle.getString("emerald"));
+    private JLabel nameStarts = new JLabel(bundle.getString("nameFilter"));
+    private JTextField nameField = new JTextField();
+    private JLabel sizeFromTo = new JLabel("< " +bundle.getString("size") + " <");
+    private JTextField sizeFrom = new JTextField();
+    private JTextField sizeTo = new JTextField();
+    private JLabel powerFromTo = new JLabel("< " +bundle.getString("power") + " <");
+    private JTextField powerFrom = new JTextField();
+    private JTextField powerTo = new JTextField();
+    private JLabel dateFromTo = new JLabel("< " +bundle.getString("date") + " <");
+    private JTextField dateFrom = new JTextField();
+    private JTextField dateTo = new JTextField();
+    private JLabel from1 = new JLabel(bundle.getString("from") + ":");
+    private JLabel from2 = new JLabel(bundle.getString("from") + ":");
+    private JLabel to1 = new JLabel(bundle.getString("to") + ":");
+    private JLabel to2 = new JLabel(bundle.getString("to") + ":");
+    private JSlider xFromSlider = new JSlider();
+    private JSlider xToSlider = new JSlider();
+    private JSlider yFromSlider = new JSlider();
+    private JSlider yToSlider = new JSlider();
+    private JButton startButton = new JButton(bundle.getString("start"));
+    private JButton stopButton = new JButton(bundle.getString("stop"));
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
 
     GUI(Connector connector) {
         this.connector = connector;
         sdf.setLenient(false);
-        //Top panel elements
-        JLabel hoText = new JLabel(" Object info - ");
-        JLabel nameText = new JLabel("Name:");
-        JLabel sizeText = new JLabel("Size:");
-        JLabel powerText = new JLabel("Power:");
-        JLabel xText = new JLabel("X:");
-        JLabel yText = new JLabel("Y:");
-        JLabel colorText = new JLabel("Color:");
-        JLabel dateText = new JLabel("Creation Date:");
-        nameValue = new JTextField();
-        sizeValue = new JTextField();
-        powerValue = new JTextField();
-        xValue = new JTextField();
-        yValue = new JTextField();
-        colorValue = new JTextField();
-        dateValue = new JTextField();
         nameValue.setEditable(false);
         sizeValue.setEditable(false);
         powerValue.setEditable(false);
@@ -73,13 +84,11 @@ class GUI extends JFrame {
         dateValue.setEditable(false);
 
         //Right panel elements
-        connectionText = new JLabel();
         connectionText.setBackground(Color.BLACK);
         connectionText.setOpaque(true);
         connectionText.setText(" ");
         connectionText.setBackground(Color.BLACK);
         connectionText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
-        JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener(arg0 -> new Thread(this::refreshCollection).start());
         filtersText = new JLabel();
         filtersText.setBackground(Color.BLACK);
@@ -87,53 +96,32 @@ class GUI extends JFrame {
         filtersText.setText(" I wonder what will happen...");
         filtersText.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         filtersText.setForeground(Color.GREEN);
-        JLabel colorText2 = new JLabel("Color:");
-        blueCheckBox = new JCheckBox("Blue");
-        sapphireCheckBox = new JCheckBox("Sapphire");
-        navyCheckBox = new JCheckBox("Navy");
-        cyanCheckBox = new JCheckBox("Cyan");
-        mintCheckBox = new JCheckBox("Mint");
-        emeraldCheckBox = new JCheckBox("Emerald");
         blueCheckBox.setSelected(true);
         sapphireCheckBox.setSelected(true);
         navyCheckBox.setSelected(true);
         cyanCheckBox.setSelected(true);
         mintCheckBox.setSelected(true);
         emeraldCheckBox.setSelected(true);
-        JLabel nameStarts = new JLabel("Name starts with:");
-        nameField = new JTextField();
-        sizeFrom = new JTextField();
-        JLabel sizeFromTo = new JLabel("< size <");
-        sizeTo = new JTextField();
-        powerFrom = new JTextField();
-        JLabel powerFromTo = new JLabel("< power <");
-        powerTo = new JTextField();
-        dateFrom = new JTextField();
-        dateFrom.setToolTipText("format: dd-MM-yyyy");
-        JLabel dateFromTo = new JLabel("< date <");
-        dateTo = new JTextField();
-        dateTo.setToolTipText("format: dd-MM-yyyy");
+
+        dateFrom.setToolTipText(bundle.getString("format") + ": dd-MM-yyyy");
+        dateTo.setToolTipText(bundle.getString("format") + ": dd-MM-yyyy");
         JLabel xFromTo = new JLabel("X:");
-        xFromSlider = new JSlider();
         xFromSlider.setMinimum(-1000);
         xFromSlider.setMaximum(1000);
         xFromSlider.setValue(-1000);
         JLabel xFrom = new JLabel("-1000");
         xFromSlider.addChangeListener(e -> xFrom.setText(Integer.toString(xFromSlider.getValue())));
-        xToSlider = new JSlider();
         xToSlider.setMinimum(-1000);
         xToSlider.setMaximum(1000);
         xToSlider.setValue(1000);
         JLabel xTo = new JLabel("1000");
         xToSlider.addChangeListener(e -> xTo.setText(Integer.toString(xToSlider.getValue())));
         JLabel yFromTo = new JLabel("Y:");
-        yFromSlider = new JSlider();
         yFromSlider.setMinimum(-1000);
         yFromSlider.setMaximum(1000);
         yFromSlider.setValue(-1000);
         JLabel yFrom = new JLabel("-1000");
         yFromSlider.addChangeListener(e -> yFrom.setText(Integer.toString(yFromSlider.getValue())));
-        yToSlider = new JSlider();
         yToSlider.setMinimum(-1000);
         yToSlider.setMaximum(1000);
         yToSlider.setValue(1000);
@@ -143,9 +131,7 @@ class GUI extends JFrame {
         xTo.setPreferredSize(new Dimension(35, 20));
         yFrom.setPreferredSize(new Dimension(35, 20));
         yTo.setPreferredSize(new Dimension(35, 20));
-        startButton = new JButton("Start");
         startButton.addActionListener(args0 -> new Thread(this::checkFilters).start());
-        stopButton = new JButton("Stop");
         stopButton.setEnabled(false);
         stopButton.addActionListener(args0 -> new Thread(this::stopAnimation).start());
 
@@ -221,14 +207,14 @@ class GUI extends JFrame {
         c.insets = new Insets(0, 10, 10, 10);
         c.gridx = 0;
         c.gridy = 0;
-        p8.add(new JLabel("from:"), c);
+        p8.add(from1, c);
         c.gridx++;
         p8.add(xFromSlider, c);
         c.gridx++;
         p8.add(xFrom, c);
         c.gridx = 0;
         c.gridy++;
-        p8.add(new JLabel("to:"), c);
+        p8.add(to1, c);
         c.gridx++;
         p8.add(xToSlider, c);
         c.gridx++;
@@ -244,14 +230,14 @@ class GUI extends JFrame {
         c2.insets = new Insets(0, 10, 10, 10);
         c2.gridx = 0;
         c2.gridy = 0;
-        p6.add(new JLabel("from:"), c2);
+        p6.add(from2, c2);
         c2.gridx++;
         p6.add(yFromSlider, c2);
         c2.gridx++;
         p6.add(yFrom, c2);
         c2.gridx = 0;
         c2.gridy++;
-        p6.add(new JLabel("to:"), c2);
+        p6.add(to2, c2);
         c2.gridx++;
         p6.add(yToSlider, c2);
         c2.gridx++;
@@ -359,7 +345,7 @@ class GUI extends JFrame {
         add(p3, BorderLayout.CENTER);
         add(p4extended, BorderLayout.EAST);
 
-        setTitle("Sea Collection Viewer");
+        setTitle(bundle.getString("title1"));
         setSize(1000, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
@@ -369,14 +355,14 @@ class GUI extends JFrame {
     static void setConnectionInfo(boolean isWorking) {
         if (isWorking) {
             connectionText.setForeground(Color.GREEN);
-            connectionText.setText(" Connection: true");
+            connectionText.setText(" " + staticBundle.getString("connected"));
         } else {
             connectionText.setForeground(Color.RED);
-            connectionText.setText(" Server is unavailable");
+            connectionText.setText(" " + staticBundle.getString("disconnected"));
         }
     }
 
-    static void setTopPanelInfo(Sea sea) {
+    void setTopPanelInfo(Sea sea) {
         nameValue.setText(sea.getName());
         sizeValue.setText(String.valueOf(sea.getSize()));
         powerValue.setText(String.valueOf(sea.getPower()));
@@ -537,5 +523,11 @@ class GUI extends JFrame {
                 break;
             }
         }
+    }
+
+    private void changeLanguage (Locale locale){
+        bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+        staticBundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+        this.setTitle(bundle.getString("title1"));
     }
 }

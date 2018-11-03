@@ -13,37 +13,30 @@ class Auth {
     private Locale eslocale = new Locale("es", "MX");
     private Locale delocale = new Locale("de", "DE");
     private Locale ltlocale = new Locale("lt", "LT");
-    ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+    private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
 
-    JMenu language = new JMenu(bundle.getString("language"));
-    JLabel loginText = new JLabel(bundle.getString("login"));
-    private JTextField loginField;
-    JLabel passwordText = new JLabel(bundle.getString("password"));
-    private JPasswordField passwordField;
+    private JMenu language = new JMenu(bundle.getString("language"));
+    private JLabel loginText = new JLabel(bundle.getString("login"));
+    private JTextField loginField = new JTextField();
+    private JLabel passwordText = new JLabel(bundle.getString("password"));
+    private JPasswordField passwordField = new JPasswordField();
     private File usersData = new File("users.csv");
     private JFrame frame = new JFrame();
     private JLabel logTooShort = new JLabel(bundle.getString("logTooShort"));
     private JLabel passTooShort = new JLabel(bundle.getString("passTooShort"));
     private JLabel objection = new JLabel(bundle.getString("objection"));
     private JLabel userAlreadyExists = new JLabel(bundle.getString("userAlreadyExists"));
-    JButton signInButton = new JButton(bundle.getString("signIn"));
-    JButton signUpButton = new JButton(bundle.getString("signUp"));
+    private JButton signInButton = new JButton(bundle.getString("signIn"));
+    private JButton signUpButton = new JButton(bundle.getString("signUp"));
 
     Auth() {
         loginText.setHorizontalAlignment(SwingConstants.CENTER);
         passwordText.setHorizontalAlignment(SwingConstants.CENTER);
         logTooShort.setForeground(Color.RED);
-        logTooShort.setPreferredSize(new Dimension(300, 20));
         passTooShort.setForeground(Color.RED);
-        passTooShort.setPreferredSize(new Dimension(300, 20));
         objection.setForeground(Color.RED);
-        objection.setPreferredSize(new Dimension(300, 20));
         userAlreadyExists.setForeground(Color.RED);
-        userAlreadyExists.setPreferredSize(new Dimension(300, 20));
-
-        loginField = new JTextField();
         loginField.setPreferredSize(new Dimension(130, 20));
-        passwordField = new JPasswordField();
         passwordField.setPreferredSize(new Dimension(130, 20));
 
         JMenuBar menuBar = new JMenuBar();
@@ -111,7 +104,7 @@ class Auth {
         c.gridy++;
         c.gridx = 0;
         c.gridwidth = 2;
-        c.gridheight = 5;
+        c.gridheight = 4;
         logTooShort.setVisible(false);
         frame.add(logTooShort, c);
         c.gridy++;
@@ -123,8 +116,6 @@ class Auth {
         c.gridy++;
         objection.setVisible(false);
         frame.add(objection, c);
-        c.gridy++;
-        frame.add(new JLabel(""),c);
 
         frame.setTitle(bundle.getString("title0"));
         frame.setSize(350, 220);
@@ -156,7 +147,7 @@ class Auth {
     private void work() {
         frame.setVisible(false);
         frame.dispose();
-        new NetworkHandler().execute(); //other way it doesn't work :\
+        new MySwingWorker().execute(); //other way it doesn't work :\
     }
 
     private void addUser() {
@@ -232,7 +223,7 @@ class Auth {
                 sb.append(Integer.toHexString((anArray & 0xFF) | 0x100), 1, 3);
             }
             return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
+        } catch (java.security.NoSuchAlgorithmException ignored) {
         }
         return null;
     }

@@ -79,7 +79,7 @@ public class Circle extends JButton {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            GUI.setTopPanelInfo(sea);
+            frame.setTopPanelInfo(sea);
         }
     }
 }
