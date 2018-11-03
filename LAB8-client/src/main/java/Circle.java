@@ -8,7 +8,7 @@ public class Circle extends JButton {
     private int diff = 40;
     private int range = diff;
     private boolean isGoingWhite = true;
-    private Sea sea;
+    public Sea sea;
     private GUI frame;
 
     Circle(Sea sea, GUI frame) {
