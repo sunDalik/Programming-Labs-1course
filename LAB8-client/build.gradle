@@ -10,7 +10,7 @@ apply plugin: 'application'
 mainClassName = 'Main'
 
 jar {
-  baseName = 'lab7client'
+  baseName = 'lab8client'
   version = '1.0'
   manifest {
     attributes "Main-Class": "$mainClassName"

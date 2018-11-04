@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 public class ORM {
     static private final String JDBC_DRIVER = "org.postgresql.Driver";
     //static private final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
-    static private final String USER = "sundalik";
-    static private final String PASS = "postgres";
+    //static private final String USER = "sundalik";
+    //static private final String PASS = "postgres";
     static private Connection conn = null;
     static private Statement stmt = null;
     static private boolean connected = false;

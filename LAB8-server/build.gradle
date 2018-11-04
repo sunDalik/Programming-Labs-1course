@@ -10,8 +10,8 @@ apply plugin: 'application'
 mainClassName = 'Main'
 
 jar {
-  baseName = 'lab7server'
-  version = '1.0.0'
+  baseName = 'lab8server'
+  version = '1.0'
   manifest {
     attributes "Main-Class": "$mainClassName"
   }
@@ -27,6 +27,7 @@ repositories {
 
 dependencies {
   compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
+  compile("org.postgresql:postgresql:42.2.2")
 }
 
 compileJava {
