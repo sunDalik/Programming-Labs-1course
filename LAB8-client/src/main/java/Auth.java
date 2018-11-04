@@ -125,7 +125,7 @@ class Auth {
                 ObjectInputStream ois = new ObjectInputStream(sc.socket().getInputStream());
                 user.command = "signIn";
                 oos.writeObject(user);
-                handleServerErrors((String)ois.readObject());
+                handleServerErrors((String) ois.readObject());
             } catch (IOException | ClassNotFoundException e) {
                 setErrorMessage(serverUnavailable);
             }
@@ -140,7 +140,7 @@ class Auth {
                 ObjectInputStream ois = new ObjectInputStream(sc.socket().getInputStream());
                 user.command = "signUp";
                 oos.writeObject(user);
-                handleServerErrors((String)ois.readObject());
+                handleServerErrors((String) ois.readObject());
             } catch (IOException | ClassNotFoundException e) {
                 setErrorMessage(serverUnavailable);
             }
@@ -148,11 +148,10 @@ class Auth {
     }
 
     private boolean checkInput(User user) {
-        if(new String(passwordField.getPassword()).length() <= 3){ //Can't check user's password because its encrypted
+        if (new String(passwordField.getPassword()).length() <= 3) { //Can't check user's password because its encrypted
             setErrorMessage(passTooShort);
             return false;
-        }
-        else if (user.getLogin().length() <= 3) {
+        } else if (user.getLogin().length() <= 3) {
             setErrorMessage(logTooShort);
             return false;
         } else return true;
@@ -195,7 +194,7 @@ class Auth {
         serverUnavailable.setText(bundle.getString("disconnected"));
     }
 
-    private void handleServerErrors(String error){
+    private void handleServerErrors(String error) {
         switch (error) {
             case "":
                 work();

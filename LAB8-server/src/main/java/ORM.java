@@ -125,8 +125,7 @@ public class ORM {
             } catch (SQLException | IllegalAccessException e) {
                 e.printStackTrace();
                 return null;
-            }
-            catch (InstantiationException e){
+            } catch (InstantiationException e) {
                 System.out.println("Table class must have an empty constructor");
                 return null;
             }
@@ -252,7 +251,7 @@ public class ORM {
                 }).collect(Collectors.joining(",\n"));
     }
 
-    private static <T> PreparedStatement makePrepStmt(String sql, T record, List<Field> fields){
+    private static <T> PreparedStatement makePrepStmt(String sql, T record, List<Field> fields) {
         try {
             PreparedStatement prepStmt = conn.prepareStatement(sql);
             for (int i = 0; i < fields.size(); i++) {
@@ -264,7 +263,7 @@ public class ORM {
                 prepStmt.setObject(i + 1, obj);
             }
             return prepStmt;
-        } catch (SQLException | IllegalAccessException e){
+        } catch (SQLException | IllegalAccessException e) {
             e.printStackTrace();
             return null;
         }

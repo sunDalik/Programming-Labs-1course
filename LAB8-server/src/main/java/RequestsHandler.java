@@ -26,12 +26,10 @@ public class RequestsHandler implements Runnable {
                 }
                 if (request.equals("Get")) {
                     oos.writeObject(sm.getCollection());
-                }
-                else if (request instanceof User){
+                } else if (request instanceof User) {
                     if (((User) request).command.equals("signIn")) {
                         oos.writeObject(Auth.signClientIn((User) request));
-                    }
-                    else if (((User) request).command.equals("signUp")) {
+                    } else if (((User) request).command.equals("signUp")) {
                         oos.writeObject(Auth.signClientUp((User) request));
                     }
                 }

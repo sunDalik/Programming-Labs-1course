@@ -62,7 +62,7 @@ class SeaManager {
      */
     boolean remove_last() {
         if (seaList.size() > 0) {
-            removedSeas.add(seaList.get(seaList.size() -1));
+            removedSeas.add(seaList.get(seaList.size() - 1));
             seaList.remove(seaList.size() - 1);
             gui.removeLastRow();
             return true;
@@ -120,11 +120,11 @@ class SeaManager {
      * Saves collection to DB
      */
     void save() {
-        for (Sea sea: seaList){
+        for (Sea sea : seaList) {
             if (sea.getId() == null) sea.setId(ORM.insertRecord(sea));
             else ORM.updateRecord(sea);
         }
-        for (Sea sea: removedSeas){
+        for (Sea sea : removedSeas) {
             if (sea.getId() != null) ORM.deleteRecord(sea);
         }
     }

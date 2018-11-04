@@ -34,7 +34,8 @@ public class Sea implements Serializable, Comparable<Sea> {
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     private static final long serialVersionUID = 78L;
 
-    Sea(){}
+    Sea() {
+    }
 
     /**
      * Is used to add new element to collection

@@ -4,7 +4,7 @@ import java.util.Locale;
 
 public class MySwingWorker extends SwingWorker<Void, Void> {
 
-    Locale locale;
+    private Locale locale;
 
     MySwingWorker(Locale locale) {
         this.locale = locale;

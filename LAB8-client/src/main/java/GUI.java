@@ -579,7 +579,7 @@ class GUI extends JFrame {
         to2.setText(bundle.getString("to") + ":");
         startButton.setText(bundle.getString("start"));
         stopButton.setText(bundle.getString("stop"));
-        if (chosenSea != null){
+        if (chosenSea != null) {
             setTopPanelInfo(chosenSea);
         }
         switch (filtersTextNumber) {

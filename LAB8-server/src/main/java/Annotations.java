@@ -2,16 +2,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-@interface Table{
+@interface Table {
     String name();
 }
 
 @Retention(RetentionPolicy.RUNTIME)
-@interface  Id{
+@interface Id {
 
 }
 
 @Retention(RetentionPolicy.RUNTIME)
-@interface Column{
+@interface Column {
     String name();
 }

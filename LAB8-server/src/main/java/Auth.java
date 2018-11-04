@@ -97,10 +97,9 @@ class Auth {
     }
 
     private void addUser(User user) {
-        if(new String(passwordField.getPassword()).length() <= 3){ //Can't check user's password because its encrypted
+        if (new String(passwordField.getPassword()).length() <= 3) { //Can't check user's password because its encrypted
             message.setText("Password must be at least 3 characters long");
-        }
-        else if (user.getLogin().length() <= 3) {
+        } else if (user.getLogin().length() <= 3) {
             message.setText("Login must be at least 3 characters long");
         } else {
             ORM.insertRecord(user);
@@ -121,7 +120,7 @@ class Auth {
     }
 
 
-    public static String signClientIn(User user) {
+    static String signClientIn(User user) {
         List<User> users = ORM.selectAll(User.class);
         if (users != null) {
             for (User dbUser : users) {
@@ -134,7 +133,7 @@ class Auth {
     }
 
 
-    public static String signClientUp(User user) {
+    static String signClientUp(User user) {
         List<User> users = ORM.selectAll(User.class);
         if (users != null) {
             for (User dbUser : users) {
