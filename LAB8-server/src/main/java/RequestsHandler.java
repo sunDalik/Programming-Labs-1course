@@ -34,8 +34,7 @@ public class RequestsHandler implements Runnable {
                     }
                 }
             }
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        } catch (IOException ignored) {
         }
     }
 

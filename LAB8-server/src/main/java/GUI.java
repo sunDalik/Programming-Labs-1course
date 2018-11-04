@@ -49,13 +49,13 @@ class GUI extends JFrame {
         collectionModel = new DefaultTableModel();
         collectionModel.setColumnIdentifiers(columns);
         JTable table = new JTable(collectionModel);
-        table.getColumnModel().getColumn(0).setPreferredWidth(120);
+        table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(50);
         table.getColumnModel().getColumn(2).setPreferredWidth(25);
         table.getColumnModel().getColumn(3).setPreferredWidth(25);
         table.getColumnModel().getColumn(4).setPreferredWidth(25);
         table.getColumnModel().getColumn(5).setPreferredWidth(35);
-        table.getColumnModel().getColumn(6).setPreferredWidth(70);
+        table.getColumnModel().getColumn(6).setPreferredWidth(90);
         JScrollPane scrollPane = new JScrollPane(table);
 
         //Sliders

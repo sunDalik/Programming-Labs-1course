@@ -1,8 +1,9 @@
 import javax.swing.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Timer;
 import java.awt.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -16,6 +17,7 @@ class GUI extends JFrame {
     private Locale eslocale = new Locale("es", "MX");
     private Locale delocale = new Locale("de");
     private Locale ltlocale = new Locale("lt");
+    private Locale chosenLocale = Locale.getDefault();
 
     private static JLabel connectionText = new JLabel();
     private static boolean isConnected = false;
@@ -70,14 +72,13 @@ class GUI extends JFrame {
     private JSlider yToSlider = new JSlider();
     private JButton startButton = new JButton(bundle.getString("start"));
     private JButton stopButton = new JButton(bundle.getString("stop"));
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss", chosenLocale);
     private Sea chosenSea;
 
 
     GUI(Connector connector, Locale locale) {
         changeLanguage(locale);
         this.connector = connector;
-        sdf.setLenient(false);
         JLabel xText = new JLabel("x:");
         JLabel yText = new JLabel("y:");
         nameValue.setEditable(false);
@@ -128,8 +129,8 @@ class GUI extends JFrame {
         mintCheckBox.setSelected(true);
         emeraldCheckBox.setSelected(true);
 
-        dateFrom.setToolTipText(bundle.getString("format") + ": dd-MM-yyyy");
-        dateTo.setToolTipText(bundle.getString("format") + ": dd-MM-yyyy");
+        dateFrom.setToolTipText(bundle.getString("format") + ": dd.MM.yyyy HH:mm:ss");
+        dateTo.setToolTipText(bundle.getString("format") + ": dd.MM.yyyy HH:mm:ss");
         JLabel xFromTo = new JLabel("X:");
         xFromSlider.setMinimum(-1000);
         xFromSlider.setMaximum(1000);
@@ -322,35 +323,36 @@ class GUI extends JFrame {
         yText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         colorText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         dateText.setFont(new Font("Helvetica", Font.PLAIN, 15));
+        dateValue.setPreferredSize(new Dimension(120,20));
         p2.add(hoText);
         p2.add(nameText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(nameValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(sizeText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(sizeValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(powerText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(powerValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(xText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(xValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(yText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(yValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(colorText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(colorValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(dateText);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
         p2.add(dateValue);
-        p2.add(Box.createRigidArea(new Dimension(10, 0)));
+        p2.add(Box.createRigidArea(new Dimension(8, 0)));
 
         JPanel p2extended = new JPanel();
         p2extended.setLayout(new BoxLayout(p2extended, BoxLayout.Y_AXIS));
@@ -371,7 +373,7 @@ class GUI extends JFrame {
         add(p4extended, BorderLayout.EAST);
 
         setTitle(bundle.getString("title1"));
-        setSize(1000, 700);
+        setSize(1150, 750);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
         firstTimeRefresh();
@@ -396,7 +398,7 @@ class GUI extends JFrame {
         xValue.setText(String.valueOf(sea.getX()));
         yValue.setText(String.valueOf(sea.getY()));
         colorValue.setText(bundle.getString(sea.getColor().name().toLowerCase()));
-        dateValue.setText(sea.getStringDate());
+        dateValue.setText(dtf.format(sea.getCreationDate()));
     }
 
     private void checkFilters() {
@@ -412,16 +414,16 @@ class GUI extends JFrame {
         } else {
             try {
                 if (!dateFrom.getText().isEmpty()) {
-                    sdf.parse(dateFrom.getText());
+                    dtf.parse(dateFrom.getText());
                 }
                 if (!dateTo.getText().isEmpty()) {
-                    sdf.parse(dateTo.getText());
+                    dtf.parse(dateTo.getText());
                 }
                 setFiltersText(bundle.getString("filtersCorrect"), false);
                 filtersTextNumber = 4;
                 applyFilters();
-            } catch (ParseException e) {
-                setFiltersText(bundle.getString("incorrectDate") + " dd-MM-yyyy!", true);
+            } catch (DateTimeParseException e) {
+                setFiltersText(bundle.getString("incorrectDate") + " dd.MM.yyyy HH:mm:ss!", true);
                 filtersTextNumber = 3;
                 startButton.setEnabled(true);
             }
@@ -444,14 +446,8 @@ class GUI extends JFrame {
                 .filter(o -> o.sea.getY() >= yFromSlider.getValue() && o.sea.getY() <= yToSlider.getValue())
                 .filter(o -> o.sea.getX() >= xFromSlider.getValue() && o.sea.getX() <= xToSlider.getValue())
                 .filter(o -> {
-                    try {
-                        if (dateFrom.getText().isEmpty() || o.sea.getDate().after(sdf.parse(dateFrom.getText()))) {
-                            if (dateTo.getText().isEmpty() || o.sea.getDate().before(sdf.parse(dateTo.getText()))) {
-                                return true;
-                            }
-                        }
-                    } catch (ParseException e) {
-                        return false;
+                    if (dateFrom.getText().isEmpty() || o.sea.getCreationDate().isAfter(LocalDateTime.parse(dateFrom.getText(), dtf))) {
+                        return dateTo.getText().isEmpty() || o.sea.getCreationDate().isBefore(LocalDateTime.parse(dateFrom.getText(), dtf));
                     }
                     return false;
                 })
@@ -552,6 +548,9 @@ class GUI extends JFrame {
     private void changeLanguage(Locale locale) {
         bundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
         staticBundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
+        chosenLocale = locale;
+        dtf = dtf.withLocale(chosenLocale);
+        //dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);
         connectionText.setText(" " + (isConnected ? staticBundle.getString("connected") : staticBundle.getString("disconnected")));
         setTitle(bundle.getString("title1"));
         language.setText(bundle.getString("language"));

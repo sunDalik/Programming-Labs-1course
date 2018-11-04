@@ -1,5 +1,6 @@
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,6 @@ public class ORM {
             stmt = conn.createStatement();
             connected = true;
         } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
             connected = false;
         }
         return connected;
@@ -111,7 +111,9 @@ public class ORM {
                     for (int i = 0; i < fields.size(); i++) {
                         Field field = fields.get(i);
                         field.setAccessible(true);
-                        Object cell = rs.getObject(i + 1);
+                        Object cell;
+                        if (field.getType().getName().equals("java.time.LocalDateTime")) cell = rs.getTimestamp(i + 1).toLocalDateTime();
+                        else cell = rs.getObject(i + 1);
                         cell = cell.equals("NULL") ? null : cell;
                         if (field.getType().isEnum() && cell != null) {
                             cell = Enum.valueOf((Class) field.getType(), cell.toString());
@@ -237,6 +239,9 @@ public class ORM {
                             break;
                         case "java.lang.String":
                             type = " TEXT";
+                            break;
+                        case "java.time.LocalDateTime":
+                            type = " TIMESTAMP";
                             break;
                         default:
                             if (field.getType().isEnum()) {

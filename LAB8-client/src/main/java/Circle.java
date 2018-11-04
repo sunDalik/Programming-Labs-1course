@@ -33,7 +33,7 @@ public class Circle extends JButton {
         double k = 0.295;
         double k2 = 0.295;
         double x = frame.p3.getWidth() / 2.08 + sea.getX() * k;
-        double y = frame.p3.getHeight() / 2.08 - sea.getY() * k2;
+        double y = frame.p3.getHeight() / 2.00 - sea.getY() * k2;
         this.setBounds((int) x, (int) y, ((Double) sea.getSize()).intValue(), ((Double) sea.getSize()).intValue());
     }
 

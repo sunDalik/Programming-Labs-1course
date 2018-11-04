@@ -1,7 +1,7 @@
 import java.io.Serializable;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 
 @Table(name = "seas")
@@ -29,9 +29,9 @@ public class Sea implements Serializable, Comparable<Sea> {
     private Colors color;
 
     @Column(name = "creation_date")
-    private String creationDate;
+    private LocalDateTime creationDate;
 
-    private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    transient private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss", Locale.getDefault());
     private static final long serialVersionUID = 78L;
 
     Sea() {
@@ -47,13 +47,13 @@ public class Sea implements Serializable, Comparable<Sea> {
         this.x = x;
         this.y = y;
         this.color = color;
-        creationDate = sdf.format(new Date());
+        creationDate = LocalDateTime.now();
     }
 
     /**
      * Is used to load element from database to collection
      */
-    Sea(int id, String name, double size, int power, int x, int y, Colors color, String creationDate) {
+    Sea(int id, String name, double size, int power, int x, int y, Colors color, LocalDateTime creationDate) {
         this.id = id;
         this.name = name;
         this.size = size;
@@ -65,13 +65,8 @@ public class Sea implements Serializable, Comparable<Sea> {
     }
 
 
-    String toCsv() {
-        return name + "," + size + "," + power + "," + x + "," + y + "," + color + "," + creationDate;
-    }
-
-
     Object[] toArray() {
-        return new Object[]{name, size, power, x, y, color, creationDate};
+        return new Object[]{name, size, power, x, y, color, creationDate.format(dtf)};
     }
 
 
@@ -112,15 +107,8 @@ public class Sea implements Serializable, Comparable<Sea> {
         return color;
     }
 
-    String getStringDate() {
+    LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    Date getDate() {
-        try {
-            return sdf.parse(creationDate);
-        } catch (ParseException e) {
-            return new Date();   //this will simply never happen I guess :^)
-        }
-    }
 }
