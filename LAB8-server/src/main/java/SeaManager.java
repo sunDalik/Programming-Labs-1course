@@ -121,15 +121,11 @@ class SeaManager {
      */
     void save() {
         for (Sea sea: seaList){
-            if (sea.getId() == null){
-                sea.setId(ORM.insertRecord(sea));
-            }
-            else {
-                ORM.updateRecord(sea);
-            }
+            if (sea.getId() == null) sea.setId(ORM.insertRecord(sea));
+            else ORM.updateRecord(sea);
         }
         for (Sea sea: removedSeas){
-            ORM.deleteRecord(sea);
+            if (sea.getId() != null) ORM.deleteRecord(sea);
         }
     }
 

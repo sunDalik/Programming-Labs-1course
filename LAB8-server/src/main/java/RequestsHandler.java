@@ -17,15 +17,23 @@ public class RequestsHandler implements Runnable {
         try {
             ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
             ObjectOutputStream oos = new ObjectOutputStream(client.getOutputStream());
-            String request;
+            Object request;
             while (true) {
                 try {
-                    request = (String) ois.readObject();
+                    request = ois.readObject();
                 } catch (ClassNotFoundException e) {
                     request = "";
                 }
                 if (request.equals("Get")) {
                     oos.writeObject(sm.getCollection());
+                }
+                else if (request instanceof User){
+                    if (((User) request).command.equals("signIn")) {
+                        oos.writeObject(Auth.signClientIn((User) request));
+                    }
+                    else if (((User) request).command.equals("signUp")) {
+                        oos.writeObject(Auth.signClientUp((User) request));
+                    }
                 }
             }
         } catch (IOException e) {

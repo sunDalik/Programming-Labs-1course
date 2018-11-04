@@ -71,9 +71,11 @@ class GUI extends JFrame {
     private JButton startButton = new JButton(bundle.getString("start"));
     private JButton stopButton = new JButton(bundle.getString("stop"));
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+    private Sea chosenSea;
 
 
-    GUI(Connector connector) {
+    GUI(Connector connector, Locale locale) {
+        changeLanguage(locale);
         this.connector = connector;
         sdf.setLenient(false);
         JLabel xText = new JLabel("x:");
@@ -387,12 +389,13 @@ class GUI extends JFrame {
     }
 
     void setTopPanelInfo(Sea sea) {
+        chosenSea = sea;
         nameValue.setText(sea.getName());
         sizeValue.setText(String.valueOf(sea.getSize()));
         powerValue.setText(String.valueOf(sea.getPower()));
         xValue.setText(String.valueOf(sea.getX()));
         yValue.setText(String.valueOf(sea.getY()));
-        colorValue.setText(sea.getColor().name());
+        colorValue.setText(bundle.getString(sea.getColor().name().toLowerCase()));
         dateValue.setText(sea.getStringDate());
     }
 
@@ -457,12 +460,12 @@ class GUI extends JFrame {
                 .filter(o -> sizeFrom.getText().isEmpty() || o.sea.getSize() >= Double.parseDouble(sizeFrom.getText()))
                 .filter(o -> sizeTo.getText().isEmpty() || o.sea.getSize() <= Double.parseDouble(sizeTo.getText()))
                 .filter(o -> o.sea.getName().startsWith(nameField.getText()))
-                .filter(o -> o.sea.getColor().name().equals(blueCheckBox.getText()) && blueCheckBox.isSelected() ||
-                        o.sea.getColor().name().equals(sapphireCheckBox.getText()) && sapphireCheckBox.isSelected() ||
-                        o.sea.getColor().name().equals(navyCheckBox.getText()) && navyCheckBox.isSelected() ||
-                        o.sea.getColor().name().equals(cyanCheckBox.getText()) && cyanCheckBox.isSelected() ||
-                        o.sea.getColor().name().equals(mintCheckBox.getText()) && mintCheckBox.isSelected() ||
-                        o.sea.getColor().name().equals(emeraldCheckBox.getText()) && emeraldCheckBox.isSelected())
+                .filter(o -> o.sea.getColor().equals(Colors.Blue) && blueCheckBox.isSelected() ||
+                        o.sea.getColor().equals(Colors.Sapphire) && sapphireCheckBox.isSelected() ||
+                        o.sea.getColor().equals(Colors.Navy) && navyCheckBox.isSelected() ||
+                        o.sea.getColor().equals(Colors.Cyan) && cyanCheckBox.isSelected() ||
+                        o.sea.getColor().equals(Colors.Mint) && mintCheckBox.isSelected() ||
+                        o.sea.getColor().equals(Colors.Emerald) && emeraldCheckBox.isSelected())
                 .forEach(filteredCircles::add);
 
         if (filteredCircles.size() == 0) {
@@ -576,7 +579,9 @@ class GUI extends JFrame {
         to2.setText(bundle.getString("to") + ":");
         startButton.setText(bundle.getString("start"));
         stopButton.setText(bundle.getString("stop"));
-
+        if (chosenSea != null){
+            setTopPanelInfo(chosenSea);
+        }
         switch (filtersTextNumber) {
             case 0:
                 setFiltersText(bundle.getString("greeting"), false);

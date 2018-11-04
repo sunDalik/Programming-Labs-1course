@@ -12,7 +12,7 @@ public class User implements Serializable {
     @Column(name = "password")
     private String password;
 
-    public String command = ""; // is used to get different commands to server ("signIn" or "signUp")
+    public String command = ""; // is used to send different commands to server ("signIn" or "signUp")
 
     private static final long serialVersionUID = 90L;
 

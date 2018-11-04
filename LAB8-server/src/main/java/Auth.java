@@ -97,10 +97,11 @@ class Auth {
     }
 
     private void addUser(User user) {
-        if (user.getLogin().length() <= 3) {
-            message.setText("Login must be at least 4 characters long");
-        } else if (user.getPassword().length() <= 3) {
-            message.setText("Password must be at least 4 characters long");
+        if(new String(passwordField.getPassword()).length() <= 3){ //Can't check user's password because its encrypted
+            message.setText("Password must be at least 3 characters long");
+        }
+        else if (user.getLogin().length() <= 3) {
+            message.setText("Login must be at least 3 characters long");
         } else {
             ORM.insertRecord(user);
             work();
@@ -117,6 +118,37 @@ class Auth {
             }
         }
         return false;
+    }
+
+
+    public static String signClientIn(User user) {
+        List<User> users = ORM.selectAll(User.class);
+        if (users != null) {
+            for (User dbUser : users) {
+                if (dbUser.getLogin().equals(user.getLogin()) && dbUser.getPassword().equals(user.getPassword())) {
+                    return ""; // no errors, user can enter
+                }
+            }
+        }
+        return "objection"; // login+password incorrect
+    }
+
+
+    public static String signClientUp(User user) {
+        List<User> users = ORM.selectAll(User.class);
+        if (users != null) {
+            for (User dbUser : users) {
+                if (dbUser.getLogin().equals(user.getLogin())) {
+                    return "userAlreadyExists";
+                }
+            }
+        }
+        if (user.getLogin().length() <= 3) {
+            return "logTooShort";
+        } else {  // There is no way to check password length since its already encrypted
+            ORM.insertRecord(user);
+            return "";
+        }
     }
 
 

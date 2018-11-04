@@ -1,9 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
-import java.util.*;
-
-import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.SocketChannel;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -13,21 +13,23 @@ class Auth {
     private Locale eslocale = new Locale("es", "MX");
     private Locale delocale = new Locale("de");
     private Locale ltlocale = new Locale("lt");
-    private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", Locale.getDefault(), new UTF8Control());
+    private Locale chosenLocale = Locale.getDefault();
+    private ResourceBundle bundle = ResourceBundle.getBundle("Bundle", chosenLocale, new UTF8Control());
 
     private JMenu language = new JMenu(bundle.getString("language"));
     private JLabel loginText = new JLabel(bundle.getString("login"));
     private JTextField loginField = new JTextField();
     private JLabel passwordText = new JLabel(bundle.getString("password"));
     private JPasswordField passwordField = new JPasswordField();
-    private File usersData = new File("users.csv");
     private JFrame frame = new JFrame();
     private JLabel logTooShort = new JLabel(bundle.getString("logTooShort"));
     private JLabel passTooShort = new JLabel(bundle.getString("passTooShort"));
     private JLabel objection = new JLabel(bundle.getString("objection"));
+    private JLabel serverUnavailable = new JLabel(bundle.getString("disconnected"));
     private JLabel userAlreadyExists = new JLabel(bundle.getString("userAlreadyExists"));
     private JButton signInButton = new JButton(bundle.getString("signIn"));
     private JButton signUpButton = new JButton(bundle.getString("signUp"));
+    private SocketAddress server = new InetSocketAddress("localhost", 11037);
 
     Auth() {
         loginText.setHorizontalAlignment(SwingConstants.CENTER);
@@ -62,25 +64,13 @@ class Auth {
         frame.setJMenuBar(menuBar);
 
         signInButton.addActionListener(args0 -> {
-            if (!checkUser()) {
-                logTooShort.setVisible(false);
-                passTooShort.setVisible(false);
-                userAlreadyExists.setVisible(false);
-                objection.setVisible(true);
-            } else {
-                work();
-            }
+            User user = new User(loginField.getText(), MD5(new String(passwordField.getPassword())));
+            signUserIn(user);
         });
 
         signUpButton.addActionListener(e -> {
-            if (checkIfExists()) {
-                logTooShort.setVisible(false);
-                passTooShort.setVisible(false);
-                userAlreadyExists.setVisible(true);
-                objection.setVisible(false);
-            } else {
-                addUser();
-            }
+            User user = new User(loginField.getText(), MD5(new String(passwordField.getPassword())));
+            signUserUp(user);
         });
 
         frame.setLayout(new GridBagLayout());
@@ -104,7 +94,7 @@ class Auth {
         c.gridy++;
         c.gridx = 0;
         c.gridwidth = 2;
-        c.gridheight = 4;
+        c.gridheight = 5;
         logTooShort.setVisible(false);
         frame.add(logTooShort, c);
         c.gridy++;
@@ -116,6 +106,9 @@ class Auth {
         c.gridy++;
         objection.setVisible(false);
         frame.add(objection, c);
+        c.gridy++;
+        serverUnavailable.setVisible(false);
+        frame.add(serverUnavailable, c);
 
         frame.setTitle(bundle.getString("title0"));
         frame.setSize(350, 220);
@@ -124,93 +117,51 @@ class Auth {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    private boolean checkIfExists() {
-        try {
-            Scanner sc = new Scanner(usersData);
-            sc.useDelimiter("[,\n]");
-            ArrayList<String> users = new ArrayList<>();
-            while (sc.hasNext()) {
-                users.add(sc.next());
-                sc.next();
+    private void signUserIn(User user) {
+        if (checkInput(user)) {
+            try {
+                SocketChannel sc = SocketChannel.open(server);
+                ObjectOutputStream oos = new ObjectOutputStream(sc.socket().getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(sc.socket().getInputStream());
+                user.command = "signIn";
+                oos.writeObject(user);
+                handleServerErrors((String)ois.readObject());
+            } catch (IOException | ClassNotFoundException e) {
+                setErrorMessage(serverUnavailable);
             }
-            for (String user : users) {
-                if (user.equals(loginField.getText())) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (FileNotFoundException e) {
-            return createNewUsersDataFile();
         }
+    }
+
+    private void signUserUp(User user) {
+        if (checkInput(user)) {
+            try {
+                SocketChannel sc = SocketChannel.open(server);
+                ObjectOutputStream oos = new ObjectOutputStream(sc.socket().getOutputStream());
+                ObjectInputStream ois = new ObjectInputStream(sc.socket().getInputStream());
+                user.command = "signUp";
+                oos.writeObject(user);
+                handleServerErrors((String)ois.readObject());
+            } catch (IOException | ClassNotFoundException e) {
+                setErrorMessage(serverUnavailable);
+            }
+        }
+    }
+
+    private boolean checkInput(User user) {
+        if(new String(passwordField.getPassword()).length() <= 3){ //Can't check user's password because its encrypted
+            setErrorMessage(passTooShort);
+            return false;
+        }
+        else if (user.getLogin().length() <= 3) {
+            setErrorMessage(logTooShort);
+            return false;
+        } else return true;
     }
 
     private void work() {
         frame.setVisible(false);
         frame.dispose();
-        new MySwingWorker().execute(); //other way it doesn't work :\
-    }
-
-    private void addUser() {
-        if (loginField.getText().length() <= 3) {
-            logTooShort.setVisible(true);
-            passTooShort.setVisible(false);
-            userAlreadyExists.setVisible(false);
-            objection.setVisible(false);
-        } else if (new String(passwordField.getPassword()).length() <= 3) {
-            logTooShort.setVisible(false);
-            passTooShort.setVisible(true);
-            userAlreadyExists.setVisible(false);
-            objection.setVisible(false);
-        } else {
-            try {
-                Scanner sc = new Scanner(usersData);
-                String old = "";
-                while (sc.hasNextLine()) {
-                    old += sc.nextLine() + "\n";
-                }
-                PrintWriter pw = new PrintWriter(usersData);
-                pw.write(old + loginField.getText() + "," + MD5(new String(passwordField.getPassword())) + "\n");
-                pw.close();
-                work();
-            } catch (FileNotFoundException e) {
-                createNewUsersDataFile();
-                addUser();
-            }
-        }
-    }
-
-    private boolean checkUser() {
-        try {
-            Scanner sc = new Scanner(usersData);
-            sc.useDelimiter("[,\n]");
-            ArrayList<String> users = new ArrayList<>();
-            ArrayList<String> passwords = new ArrayList<>();
-            while (sc.hasNext()) {
-                users.add(sc.next());
-                passwords.add(sc.next());
-            }
-            String login = loginField.getText();
-            String password = MD5(new String(passwordField.getPassword()));
-            for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).equals(login) && passwords.get(i).equals(password)) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (FileNotFoundException e) {
-            return createNewUsersDataFile();
-        }
-    }
-
-    private boolean createNewUsersDataFile() {
-        try {
-            new File("users.csv").createNewFile();
-            return false;
-        } catch (IOException e1) {
-            e1.printStackTrace();
-            System.exit(1);
-            return false;
-        }
+        new MySwingWorker(chosenLocale).execute();
     }
 
 
@@ -218,7 +169,7 @@ class Auth {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (byte anArray : array) {
                 sb.append(Integer.toHexString((anArray & 0xFF) | 0x100), 1, 3);
             }
@@ -229,6 +180,7 @@ class Auth {
     }
 
     private void changeLanguage(Locale locale) {
+        chosenLocale = locale;
         bundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
         frame.setTitle(bundle.getString("title0"));
         language.setText(bundle.getString("language"));
@@ -240,6 +192,32 @@ class Auth {
         logTooShort.setText(bundle.getString("logTooShort"));
         passTooShort.setText(bundle.getString("passTooShort"));
         userAlreadyExists.setText(bundle.getString("userAlreadyExists"));
+        serverUnavailable.setText(bundle.getString("disconnected"));
+    }
 
+    private void handleServerErrors(String error){
+        switch (error) {
+            case "":
+                work();
+                break;
+            case "logTooShort":
+                setErrorMessage(logTooShort);
+                break;
+            case "userAlreadyExists":
+                setErrorMessage(userAlreadyExists);
+                break;
+            case "objection":
+                setErrorMessage(objection);
+                break;
+        }
+    }
+
+    private void setErrorMessage(JLabel message) {
+        logTooShort.setVisible(false);
+        passTooShort.setVisible(false);
+        userAlreadyExists.setVisible(false);
+        objection.setVisible(false);
+        serverUnavailable.setVisible(false);
+        message.setVisible(true);
     }
 }
