@@ -4,175 +4,213 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ORM {
-    static final String JDBC_DRIVER = "org.postgresql.Driver";
-    static final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
-    static final String USER = "sundalik";
-    static final String PASS = "postgres";
-    static Connection conn = null;
-    static Statement stmt = null;
+    static private final String JDBC_DRIVER = "org.postgresql.Driver";
+    //static private final String DB_URL = "jdbc:postgresql://localhost:5432/postgres";
+    static private final String USER = "sundalik";
+    static private final String PASS = "postgres";
+    static private Connection conn = null;
+    static private Statement stmt = null;
+    static private boolean connected = false;
 
-    public static void main(String[] args) {
-        //createTable(Sea.class);
+    public static boolean connect(String DB_URL, String USER, String PASS) {
         try {
             Class.forName(JDBC_DRIVER);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = conn.createStatement();
-        } catch (SQLException e) {
+            connected = true;
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
+            connected = false;
         }
+        return connected;
     }
 
     public static <T> void updateRecord(T record) {
-        Table table = record.getClass().getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalArgumentException("No @Table annotation found.");
-        }
-        Field idField = null;
-        for (Field field : record.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
-                idField = field;
-                break;
+        if (connected) {
+            Table table = record.getClass().getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
             }
-        }
-        if (idField == null) {
-            throw new IllegalArgumentException("No @Id && @Column annotation found");
-        }
-        String sql = "UPDATE " + table.name() + " SET ";
-        List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
-                .collect(Collectors.toList());
-        sql += fields.stream()
-                .map(field -> field.getDeclaredAnnotation(Column.class).name() + " = ?")
-                .collect(Collectors.joining(", "));
-        idField.setAccessible(true);
-        try {
-            sql += " WHERE " + idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        executePrepStmt(sql, record, fields);
+            Field idField = null;
+            for (Field field : record.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
+                    idField = field;
+                    break;
+                }
+            }
+            if (idField == null) {
+                throw new IllegalArgumentException("No @Id && @Column annotation found");
+            }
+            String sql = "UPDATE " + table.name() + " SET ";
+            List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                    .collect(Collectors.toList());
+            sql += fields.stream()
+                    .map(field -> field.getDeclaredAnnotation(Column.class).name() + " = ?")
+                    .collect(Collectors.joining(", "));
+            idField.setAccessible(true);
+            try {
+                sql += " WHERE " + idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
+                makePrepStmt(sql, record, fields).executeUpdate();
+            } catch (IllegalAccessException | SQLException e) {
+                e.printStackTrace();
+            }
+        } else System.out.println("No DB connected");
     }
 
 
     public static <T> void deleteRecord(T record) {
-        Table table = record.getClass().getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalArgumentException("No @Table annotation found.");
-        }
-        String sql = "DELETE FROM " + table.name() + " WHERE ";
-        Field idField = null;
-        for (Field field : record.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
-                idField = field;
-                break;
+        if (connected) {
+            Table table = record.getClass().getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
             }
-        }
-        if (idField == null) {
-            throw new IllegalArgumentException("No @Id && @Column annotation found");
-        } else {
-            idField.setAccessible(true);
-            try {
-                sql += idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
-                stmt.executeUpdate(sql);
-            } catch (SQLException | IllegalAccessException e) {
-                e.printStackTrace();
+            String sql = "DELETE FROM " + table.name() + " WHERE ";
+            Field idField = null;
+            for (Field field : record.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
+                    idField = field;
+                    break;
+                }
             }
-        }
+            if (idField == null) {
+                throw new IllegalArgumentException("No @Id && @Column annotation found");
+            } else {
+                idField.setAccessible(true);
+                try {
+                    sql += idField.getDeclaredAnnotation(Column.class).name() + " = " + idField.get(record) + ";";
+                    stmt.executeUpdate(sql);
+                } catch (SQLException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else System.out.println("No DB connected");
     }
 
 
     public static <T> List<T> selectAll(Class<T> tableClass) {
-        Table table = tableClass.getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalArgumentException("No @Table annotation found.");
-        }
-
-        List<Field> fields = Arrays.stream(tableClass.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
-                .collect(Collectors.toList());
-        String fieldNames = fields.stream()
-                .map(field -> field.getAnnotation(Column.class).name())
-                .collect(Collectors.joining(", "));
-        try {
-            ResultSet rs = stmt.executeQuery("SELECT " + fieldNames + " FROM " + table.name() + ";");
-            List<T> list = new LinkedList<>();
-            while (rs.next()) {
-                T record = tableClass.newInstance();
-                for (int i = 0; i < fields.size(); i++) {
-                    Field field = fields.get(i);
-                    field.setAccessible(true);
-                    Object cell = rs.getObject(i + 1);
-                    cell = cell.equals("NULL") ? null : cell;
-                    if (field.getType().isEnum() && cell != null) {
-                        cell = Enum.valueOf((Class) field.getType(), cell.toString());
-                    }
-                    field.set(record, cell);
-                }
-                list.add(record);
+        if (connected) {
+            Table table = tableClass.getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
             }
-            rs.close();
-            return list;
-        } catch (SQLException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
+
+            List<Field> fields = Arrays.stream(tableClass.getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(Column.class))
+                    .collect(Collectors.toList());
+            String fieldNames = fields.stream()
+                    .map(field -> field.getAnnotation(Column.class).name())
+                    .collect(Collectors.joining(", "));
+            try {
+                ResultSet rs = stmt.executeQuery("SELECT " + fieldNames + " FROM " + table.name() + ";");
+                List<T> list = new LinkedList<>();
+                while (rs.next()) {
+                    T record = tableClass.newInstance();
+                    for (int i = 0; i < fields.size(); i++) {
+                        Field field = fields.get(i);
+                        field.setAccessible(true);
+                        Object cell = rs.getObject(i + 1);
+                        cell = cell.equals("NULL") ? null : cell;
+                        if (field.getType().isEnum() && cell != null) {
+                            cell = Enum.valueOf((Class) field.getType(), cell.toString());
+                        }
+                        field.set(record, cell);
+                    }
+                    list.add(record);
+                }
+                rs.close();
+                return list;
+            } catch (SQLException | IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+            catch (InstantiationException e){
+                System.out.println("Table class must have an empty constructor");
+                return null;
+            }
+        } else {
+            System.out.println("No DB connected");
             return null;
         }
     }
 
 
-    public static <T> int insertRecord(T record) {
-        Table table = record.getClass().getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalArgumentException("No @Table annotation found.");
-        }
-        String sql = "INSERT INTO " + table.name() + " (";
-        List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
-                .collect(Collectors.toList());
-        sql += fields.stream()
-                .map(field -> field.getAnnotation(Column.class).name())
-                .collect(Collectors.joining(", "));
-        sql += ")\nVALUES (";
-        sql += fields.stream()
-                .map(field -> "?")
-                .collect(Collectors.joining(", "));
-        Field idField = null;
-        for (Field field : record.getClass().getDeclaredFields()) {
-            if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
-                idField = field;
-                break;
+    public static <T> Integer insertRecord(T record) {
+        if (connected) {
+            Table table = record.getClass().getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
             }
-        }
-        if (idField == null) {
-            throw new IllegalArgumentException("No @Id && @Column annotation found");
-        }
-        try {
-            idField.setAccessible(true);
-            sql += ") RETURNING (" + idField.get(record) + ");";
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        ResultSet rs = executePrepStmt(sql, record, fields);
-        try {
-            return (int) rs.getObject(1);
-        } catch (SQLException e) {
-            throw new RuntimeException("I have no idea what went wrong");
+            String sql = "INSERT INTO " + table.name() + " (";
+            List<Field> fields = Arrays.stream(record.getClass().getDeclaredFields())
+                    .filter(field -> field.isAnnotationPresent(Column.class) && !field.isAnnotationPresent(Id.class))
+                    .collect(Collectors.toList());
+            sql += fields.stream()
+                    .map(field -> field.getAnnotation(Column.class).name())
+                    .collect(Collectors.joining(", "));
+            sql += ")\nVALUES (";
+            sql += fields.stream()
+                    .map(field -> "?")
+                    .collect(Collectors.joining(", "));
+            Field idField = null;
+            for (Field field : record.getClass().getDeclaredFields()) {
+                if (field.isAnnotationPresent(Id.class) && field.isAnnotationPresent(Column.class)) {
+                    idField = field;
+                    break;
+                }
+            }
+            if (idField == null) {
+                throw new IllegalArgumentException("No @Id && @Column annotation found");
+            }
+            sql += ") RETURNING (" + idField.getAnnotation(Column.class).name() + ");";
+            ResultSet rs = null;
+            try {
+                rs = makePrepStmt(sql, record, fields).executeQuery();
+                rs.next();
+                return (Integer) rs.getObject(1);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
+            System.out.println("No DB connected");
+            return -1;
         }
     }
 
 
-    public static void createTableSql(Class<?> tableClass) {
-        Table table = tableClass.getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalArgumentException("No @Table annotation found.");
-        }
-        String fields = Arrays.stream(tableClass.getDeclaredFields())
+    public static void createTable(Class<?> tableClass) {
+        if (connected) {
+            Table table = tableClass.getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
+            }
+            try {
+                stmt.executeUpdate("CREATE TABLE " + table.name() + "(\n" + createTableGetFields(tableClass) + "\n);");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else System.out.println("No DB connected");
+    }
+
+    public static void createTableIfNotExists(Class<?> tableClass) {
+        if (connected) {
+            Table table = tableClass.getDeclaredAnnotation(Table.class);
+            if (table == null) {
+                throw new IllegalArgumentException("No @Table annotation found.");
+            }
+            try {
+                stmt.executeUpdate("CREATE TABLE IF NOT EXISTS " + table.name() + "(\n" + createTableGetFields(tableClass) + "\n);");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else System.out.println("No DB connected");
+    }
+
+    private static String createTableGetFields(Class<?> tableClass) {
+        return Arrays.stream(tableClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Column.class))
                 .map(field -> {
                     String name = field.getAnnotation(Column.class).name();
@@ -212,14 +250,9 @@ public class ORM {
                         return name + " SERIAL PRIMARY KEY";
                     } else return name + type;
                 }).collect(Collectors.joining(",\n"));
-        try {
-            stmt.executeUpdate("CREATE TABLE " + table.name() + "(\n" + fields + "\n);");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
-    static public <T> ResultSet executePrepStmt(String sql, T record, List<Field> fields){
+    private static <T> PreparedStatement makePrepStmt(String sql, T record, List<Field> fields){
         try {
             PreparedStatement prepStmt = conn.prepareStatement(sql);
             for (int i = 0; i < fields.size(); i++) {
@@ -230,9 +263,11 @@ public class ORM {
                 }
                 prepStmt.setObject(i + 1, obj);
             }
-            return prepStmt.executeQuery();
-        } catch (SQLException | IllegalAccessException e) {
-            throw new RuntimeException("Your SQL is wrong I guess?");
+            return prepStmt;
+        } catch (SQLException | IllegalAccessException e){
+            e.printStackTrace();
+            return null;
         }
     }
+
 }

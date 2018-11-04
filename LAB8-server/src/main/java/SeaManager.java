@@ -1,8 +1,3 @@
-import javax.swing.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -11,34 +6,20 @@ import java.util.stream.Stream;
 
 class SeaManager {
     private List<Sea> seaList = Collections.synchronizedList(new LinkedList<>());
-    private String file;
+    private List<Sea> removedSeas = Collections.synchronizedList(new LinkedList<>());
     private GUI gui;
 
-    SeaManager(String file, GUI gui) {
-        this.file = file;
+    SeaManager(GUI gui) {
         this.gui = gui;
+        ORM.createTableIfNotExists(Sea.class);
     }
 
     /**
-     * Loads all elements from file to collection
+     * Loads all elements from DB to collection
      */
     void load() {
-        try {
-            Scanner FileLoader = new Scanner(new File(file));
-            FileLoader.useDelimiter("[,\n]");
-            seaList.clear();
-            while (FileLoader.hasNext()) {
-                seaList.add(new Sea(FileLoader.next(), Double.parseDouble(FileLoader.next()), FileLoader.nextInt(), FileLoader.nextInt(), FileLoader.nextInt(), Colors.valueOf(FileLoader.next()), FileLoader.next()));
-            }
-            FileLoader.close();
-        } catch (FileNotFoundException e) {
-            try {
-                new File(file).createNewFile();
-            } catch (IOException ee) {
-                System.out.println(ee.getMessage());
-                System.exit(1);
-            }
-        }
+        seaList = ORM.selectAll(Sea.class);
+        if (seaList == null) seaList = Collections.synchronizedList(new LinkedList<>());
         gui.refreshTable(seaList);
     }
 
@@ -65,6 +46,7 @@ class SeaManager {
      */
     boolean remove_first() {
         if (seaList.size() > 0) {
+            removedSeas.add(seaList.get(0));
             seaList.remove(0);
             gui.refreshTable(seaList);
             return true;
@@ -80,39 +62,12 @@ class SeaManager {
      */
     boolean remove_last() {
         if (seaList.size() > 0) {
+            removedSeas.add(seaList.get(seaList.size() -1));
             seaList.remove(seaList.size() - 1);
             gui.removeLastRow();
             return true;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Adds all elements from file you chose
-     */
-    void importCollection() {
-        JFileChooser jfc = new JFileChooser();
-        jfc.setCurrentDirectory(new java.io.File("."));
-        if (jfc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            File collectionToImportFile = jfc.getSelectedFile();
-            LinkedList<Sea> collectionToImport = new LinkedList<>();
-            try {
-                Scanner importLoader = new Scanner(collectionToImportFile);
-                importLoader.useDelimiter("[,\n]");
-                while (importLoader.hasNext()) {
-                    collectionToImport.add(new Sea(importLoader.next(), Double.parseDouble(importLoader.next()), importLoader.nextInt(), importLoader.nextInt(), importLoader.nextInt(), Colors.valueOf(importLoader.next()), importLoader.next()));
-                }
-                importLoader.close();
-            } catch (FileNotFoundException e) {
-                gui.printToConsole("Файл был удален", true);
-            } catch (IllegalArgumentException | InputMismatchException e) {
-                gui.printToConsole("Неправильный формат коллекции!", true);
-            }
-            for (Sea sea : collectionToImport) {
-                seaList.add(sea);
-                gui.addToTable(sea);
-            }
         }
     }
 
@@ -125,6 +80,7 @@ class SeaManager {
         int n = 0;
         for (int i = seaList.size() - 1; i >= 0; i--) {
             if (seaList.get(i).compareTo(object) > 0) {
+                removedSeas.add(seaList.get(i));
                 seaList.remove(i);
                 n++;
             }
@@ -161,23 +117,19 @@ class SeaManager {
     }
 
     /**
-     * @return elements of collection in csv
-     */
-    private String read() {
-        Stream<Sea> SeaStream = seaList.stream();
-        return SeaStream.map(s -> s.toCsv() + "\n").collect(Collectors.joining());
-    }
-
-    /**
-     * Saves collection to file
+     * Saves collection to DB
      */
     void save() {
-        try {
-            PrintWriter pw = new PrintWriter(file);
-            pw.print(read());
-            pw.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        for (Sea sea: seaList){
+            if (sea.getId() == null){
+                sea.setId(ORM.insertRecord(sea));
+            }
+            else {
+                ORM.updateRecord(sea);
+            }
+        }
+        for (Sea sea: removedSeas){
+            ORM.deleteRecord(sea);
         }
     }
 

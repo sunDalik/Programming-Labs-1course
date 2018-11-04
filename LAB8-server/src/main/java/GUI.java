@@ -25,15 +25,12 @@ class GUI extends JFrame {
         UIManager.put("TextField.font", new Font("Helvetica", Font.PLAIN, 15));
         JMenu file = new JMenu("File");
         JMenuItem load_item = new JMenuItem("Load");
-        JMenuItem import_item = new JMenuItem("Import");
         JMenuItem save_item = new JMenuItem("Save");
         JMenuItem exit_item = new JMenuItem("Exit");
         file.add(load_item);
-        file.add(import_item);
         file.add(save_item);
         file.add(exit_item);
         load_item.addActionListener(arg0 -> Auth.sm.load());
-        import_item.addActionListener(arg0 -> Auth.sm.importCollection());
         save_item.addActionListener(arg0 -> Auth.sm.save());
         exit_item.addActionListener(arg0 -> System.exit(0));
         menuBar.add(file);
@@ -362,7 +359,7 @@ class GUI extends JFrame {
      * @param message - literally message
      * @param isError - true - red color, false - green color
      */
-    void printToConsole(String message, Boolean isError) {
+    private void printToConsole(String message, Boolean isError) {
         if (isError) {
             operationResult.setForeground(Color.RED);
         } else {

@@ -1,24 +1,7 @@
 import java.io.Serializable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-@Retention(RetentionPolicy.RUNTIME)
-@interface Table{
-    String name();
-}
-
-@Retention(RetentionPolicy.RUNTIME)
-@interface  Id{
-
-}
-
-@Retention(RetentionPolicy.RUNTIME)
-@interface Column{
-    String name();
-}
 
 
 @Table(name = "seas")
@@ -50,6 +33,8 @@ public class Sea implements Serializable, Comparable<Sea> {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
     private static final long serialVersionUID = 78L;
+
+    Sea(){}
 
     /**
      * Is used to add new element to collection
@@ -92,6 +77,14 @@ public class Sea implements Serializable, Comparable<Sea> {
     @Override
     public int compareTo(Sea o) {
         return Double.compare(size, o.size);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     String getName() {
