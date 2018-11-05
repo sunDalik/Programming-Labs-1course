@@ -1,7 +1,9 @@
+
 import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
 import java.util.Timer;
 import java.awt.*;
 import java.util.*;
@@ -17,7 +19,6 @@ class GUI extends JFrame {
     private Locale eslocale = new Locale("es", "MX");
     private Locale delocale = new Locale("de");
     private Locale ltlocale = new Locale("lt");
-    private Locale chosenLocale = Locale.getDefault();
 
     private static JLabel connectionText = new JLabel();
     private static boolean isConnected = false;
@@ -72,8 +73,9 @@ class GUI extends JFrame {
     private JSlider yToSlider = new JSlider();
     private JButton startButton = new JButton(bundle.getString("start"));
     private JButton stopButton = new JButton(bundle.getString("stop"));
-    private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss", chosenLocale);
+    private DateTimeFormatter displayDateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.LONG, FormatStyle.MEDIUM).withLocale(Locale.getDefault());
     private Sea chosenSea;
+    private DateTimeFormatter filterDateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.uuuu HH:mm:ss");
 
 
     GUI(Connector connector, Locale locale) {
@@ -323,7 +325,7 @@ class GUI extends JFrame {
         yText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         colorText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         dateText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        dateValue.setPreferredSize(new Dimension(120,20));
+        dateValue.setPreferredSize(new Dimension(150, 20));
         p2.add(hoText);
         p2.add(nameText);
         p2.add(Box.createRigidArea(new Dimension(8, 0)));
@@ -398,7 +400,7 @@ class GUI extends JFrame {
         xValue.setText(String.valueOf(sea.getX()));
         yValue.setText(String.valueOf(sea.getY()));
         colorValue.setText(bundle.getString(sea.getColor().name().toLowerCase()));
-        dateValue.setText(dtf.format(sea.getCreationDate()));
+        dateValue.setText(displayDateTimeFormatter.format(sea.getCreationDate()));
     }
 
     private void checkFilters() {
@@ -414,10 +416,10 @@ class GUI extends JFrame {
         } else {
             try {
                 if (!dateFrom.getText().isEmpty()) {
-                    dtf.parse(dateFrom.getText());
+                    filterDateTimeFormatter.parse(dateFrom.getText());
                 }
                 if (!dateTo.getText().isEmpty()) {
-                    dtf.parse(dateTo.getText());
+                    filterDateTimeFormatter.parse(dateTo.getText());
                 }
                 setFiltersText(bundle.getString("filtersCorrect"), false);
                 filtersTextNumber = 4;
@@ -446,8 +448,8 @@ class GUI extends JFrame {
                 .filter(o -> o.sea.getY() >= yFromSlider.getValue() && o.sea.getY() <= yToSlider.getValue())
                 .filter(o -> o.sea.getX() >= xFromSlider.getValue() && o.sea.getX() <= xToSlider.getValue())
                 .filter(o -> {
-                    if (dateFrom.getText().isEmpty() || o.sea.getCreationDate().isAfter(LocalDateTime.parse(dateFrom.getText(), dtf))) {
-                        return dateTo.getText().isEmpty() || o.sea.getCreationDate().isBefore(LocalDateTime.parse(dateFrom.getText(), dtf));
+                    if (dateFrom.getText().isEmpty() || o.sea.getCreationDate().isAfter(LocalDateTime.parse(dateFrom.getText(), filterDateTimeFormatter))) {
+                        return dateTo.getText().isEmpty() || o.sea.getCreationDate().isBefore(LocalDateTime.parse(dateTo.getText(), filterDateTimeFormatter));
                     }
                     return false;
                 })
@@ -548,9 +550,7 @@ class GUI extends JFrame {
     private void changeLanguage(Locale locale) {
         bundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
         staticBundle = ResourceBundle.getBundle("Bundle", locale, new UTF8Control());
-        chosenLocale = locale;
-        dtf = dtf.withLocale(chosenLocale);
-        //dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(locale);
+        displayDateTimeFormatter = displayDateTimeFormatter.withLocale(locale);
         connectionText.setText(" " + (isConnected ? staticBundle.getString("connected") : staticBundle.getString("disconnected")));
         setTitle(bundle.getString("title1"));
         language.setText(bundle.getString("language"));
