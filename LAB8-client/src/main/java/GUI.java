@@ -523,6 +523,8 @@ class GUI extends JFrame {
             filtersTextNumber = 7;
             p3.revalidate();
             p3.repaint();
+            startButton.setEnabled(true);
+            stopButton.setEnabled(false);
         } else {
             setFiltersText(bundle.getString("tryAgain"), true);
             filtersTextNumber = 8;
