@@ -92,9 +92,6 @@ class GUI extends JFrame {
         dateValue.setEditable(false);
 
         JMenuBar menuBar = new JMenuBar();
-        UIManager.put("Menu.font", new Font("Helvetica", Font.PLAIN, 16));
-        UIManager.put("MenuItem.font", new Font("Helvetica", Font.PLAIN, 16));
-        UIManager.put("TextField.font", new Font("Helvetica", Font.PLAIN, 15));
         JMenuItem en_item = new JMenuItem("English");
         JMenuItem ru_item = new JMenuItem("Русский");
         JMenuItem es_item = new JMenuItem("Español");
@@ -317,14 +314,6 @@ class GUI extends JFrame {
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.X_AXIS));
-        hoText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        nameText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        sizeText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        powerText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        xText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        yText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        colorText.setFont(new Font("Helvetica", Font.PLAIN, 15));
-        dateText.setFont(new Font("Helvetica", Font.PLAIN, 15));
         dateValue.setPreferredSize(new Dimension(150, 20));
         p2.add(hoText);
         p2.add(nameText);

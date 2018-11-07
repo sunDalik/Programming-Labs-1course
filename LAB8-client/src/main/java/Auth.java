@@ -42,9 +42,6 @@ class Auth {
         passwordField.setPreferredSize(new Dimension(130, 20));
 
         JMenuBar menuBar = new JMenuBar();
-        UIManager.put("Menu.font", new Font("Helvetica", Font.PLAIN, 16));
-        UIManager.put("MenuItem.font", new Font("Helvetica", Font.PLAIN, 16));
-        UIManager.put("TextField.font", new Font("Helvetica", Font.PLAIN, 15));
         JMenuItem en_item = new JMenuItem("English");
         JMenuItem ru_item = new JMenuItem("Русский");
         JMenuItem es_item = new JMenuItem("Español");
